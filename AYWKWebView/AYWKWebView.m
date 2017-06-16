@@ -448,24 +448,29 @@ NSArray* infoOpenURLs() {
 #pragma mark UrlSchemes OpenURLs拦截
 -(void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
     NSURL *url = navigationAction.request.URL;
-    UIApplication *app = [UIApplication sharedApplication];
     if([infoOpenURLs() containsObject:url.scheme]) {
-        if ([app canOpenURL:url]){
-            [self userInteractionDisableWithTime:0.2];
-            [app openURL:url];
-            decisionHandler(WKNavigationActionPolicyCancel);
-            return;
-        }
+        decisionHandler(WKNavigationActionPolicyCancel);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIApplication *app = [UIApplication sharedApplication];
+            if ([app canOpenURL:url]){
+                [self userInteractionDisableWithTime:0.2];
+                [app openURL:url];
+            }
+        });
+        return;
     }
     
     if([infoUrlSchemes() containsObject:url.scheme] ||
        [url.absoluteString containsString:@"itunes.apple.com"] ||
        [url.absoluteString isEqualToString:UIApplicationOpenSettingsURLString]) {
-        if ([app canOpenURL:url]){
-            [app openURL:url];
-            decisionHandler(WKNavigationActionPolicyCancel);
-            return;
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIApplication *app = [UIApplication sharedApplication];
+            if ([app canOpenURL:url]){
+                decisionHandler(WKNavigationActionPolicyCancel);
+                [app openURL:url];
+            }
+        });
+        return;
     }
     
     if ([self.navigationDelegateReceiver respondsToSelector:@selector(webView:decidePolicyForNavigationAction:decisionHandler:)]) {
