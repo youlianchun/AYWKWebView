@@ -27,69 +27,41 @@ static NSString*  kWebViewCertificateChain = @"certificateChain";//当前导航�
 static NSString*  kWebViewHasOnlySecureContent = @"hasOnlySecureContent";//标识页面中的所有资源是否通过安全加密连接来加载
 
 @interface WkObserver : NSObject
-@property (nonatomic, assign) BOOL enabled;
-@property (nonatomic, weak) AYWKWebView *webView;
 @end
 @implementation WkObserver
--(void)setEnabled:(BOOL)enabled {
-    if (_enabled == enabled) {
-        return;
-    }
-    _enabled = enabled;
-    if (_enabled) {
-        [self addObserver:self forKeyPath:kWebViewEstimatedProgress options:NSKeyValueObservingOptionNew context:nil];
-        [self addObserver:self forKeyPath:kWebViewCanGoBack options:NSKeyValueObservingOptionNew context:nil];
-        [self addObserver:self forKeyPath:kWebViewCanGoForward options:NSKeyValueObservingOptionNew context:nil];
-        [self addObserver:self forKeyPath:kWebViewTitle options:NSKeyValueObservingOptionNew context:nil];
-        [self addObserver:self forKeyPath:kWebViewUrl options:NSKeyValueObservingOptionNew context:nil];
-        [self addObserver:self forKeyPath:kWebViewLoading options:NSKeyValueObservingOptionNew context:nil];
-        [self addObserver:self forKeyPath:kWebViewCertificateChain options:NSKeyValueObservingOptionNew context:nil];
-        [self addObserver:self forKeyPath:kWebViewHasOnlySecureContent options:NSKeyValueObservingOptionNew context:nil];
-        
-    }else{
-        [self removeObserver:self forKeyPath:kWebViewEstimatedProgress];
-        [self removeObserver:self forKeyPath:kWebViewCanGoBack];
-        [self removeObserver:self forKeyPath:kWebViewCanGoForward];
-        [self removeObserver:self forKeyPath:kWebViewTitle];
-        [self removeObserver:self forKeyPath:kWebViewUrl];
-        [self removeObserver:self forKeyPath:kWebViewLoading];
-        [self removeObserver:self forKeyPath:kWebViewCertificateChain];
-        [self removeObserver:self forKeyPath:kWebViewHasOnlySecureContent];
-    }
-}
-
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context{
     id newValue = [change objectForKey:@"new"];
-    if ([keyPath isEqualToString:kWebViewEstimatedProgress] && [self.webView.observerDelegate respondsToSelector:@selector(webView:estimatedProgress:)]) {
-        [self.webView.observerDelegate webView:self.webView estimatedProgress:[newValue doubleValue]];
+    AYWKWebView *webView = object;
+    if ([keyPath isEqualToString:kWebViewEstimatedProgress] && [webView.observerDelegate respondsToSelector:@selector(webView:estimatedProgress:)]) {
+        [webView.observerDelegate webView:webView estimatedProgress:[newValue doubleValue]];
         return;
     }
-    if ([keyPath isEqualToString:kWebViewCanGoBack] && [self.webView.observerDelegate respondsToSelector:@selector(webView:canGoBackChange:)]) {
-        [self.webView.observerDelegate webView:self.webView canGoBackChange:[newValue boolValue]];
+    if ([keyPath isEqualToString:kWebViewCanGoBack] && [webView.observerDelegate respondsToSelector:@selector(webView:canGoBackChange:)]) {
+        [webView.observerDelegate webView:webView canGoBackChange:[newValue boolValue]];
         return;
     }
-    if ([keyPath isEqualToString:kWebViewCanGoForward] && [self.webView.observerDelegate respondsToSelector:@selector(webView:canGoForwardChange:)]) {
-        [self.webView.observerDelegate webView:self.webView canGoForwardChange:[newValue boolValue]];
+    if ([keyPath isEqualToString:kWebViewCanGoForward] && [webView.observerDelegate respondsToSelector:@selector(webView:canGoForwardChange:)]) {
+        [webView.observerDelegate webView:webView canGoForwardChange:[newValue boolValue]];
         return;
     }
-    if ([keyPath isEqualToString:kWebViewTitle] && [self.webView.observerDelegate respondsToSelector:@selector(webView:titleChange:)]) {
-        [self.webView.observerDelegate webView:self.webView titleChange:newValue];
+    if ([keyPath isEqualToString:kWebViewTitle] && [webView.observerDelegate respondsToSelector:@selector(webView:titleChange:)]) {
+        [webView.observerDelegate webView:webView titleChange:newValue];
         return;
     }
-    if ([keyPath isEqualToString:kWebViewUrl] && [self.webView.observerDelegate respondsToSelector:@selector(webView:urlChange:)]) {
-        [self.webView.observerDelegate webView:self.webView urlChange:newValue];
+    if ([keyPath isEqualToString:kWebViewUrl] && [webView.observerDelegate respondsToSelector:@selector(webView:urlChange:)]) {
+        [webView.observerDelegate webView:webView urlChange:newValue];
         return;
     }
-    if ([keyPath isEqualToString:kWebViewLoading] && [self.webView.observerDelegate respondsToSelector:@selector(webView:loadingChange:)]) {
-        [self.webView.observerDelegate webView:self.webView loadingChange:[newValue boolValue]];
+    if ([keyPath isEqualToString:kWebViewLoading] && [webView.observerDelegate respondsToSelector:@selector(webView:loadingChange:)]) {
+        [webView.observerDelegate webView:webView loadingChange:[newValue boolValue]];
         return;
     }
-    if ([keyPath isEqualToString:kWebViewCertificateChain] && [self.webView.observerDelegate respondsToSelector:@selector(webView:certificateChainChange:)]) {
-        [self.webView.observerDelegate webView:self.webView certificateChainChange:newValue];
+    if ([keyPath isEqualToString:kWebViewCertificateChain] && [webView.observerDelegate respondsToSelector:@selector(webView:certificateChainChange:)]) {
+        [webView.observerDelegate webView:webView certificateChainChange:newValue];
         return;
     }
-    if ([keyPath isEqualToString:kWebViewHasOnlySecureContent] && [self.webView.observerDelegate respondsToSelector:@selector(webView:hasOnlySecureContentChange:)]) {
-        [self.webView.observerDelegate webView:self.webView hasOnlySecureContentChange:[newValue boolValue]];
+    if ([keyPath isEqualToString:kWebViewHasOnlySecureContent] && [webView.observerDelegate respondsToSelector:@selector(webView:hasOnlySecureContentChange:)]) {
+        [webView.observerDelegate webView:webView hasOnlySecureContentChange:[newValue boolValue]];
         return;
     }
 }
@@ -106,6 +78,8 @@ static NSString*  kWebViewHasOnlySecureContent = @"hasOnlySecureContent";//标�
 @property (nonatomic, weak) UILongPressGestureRecognizer *longPressGesture;
 
 @property (nonatomic, strong) WkObserver *wkObserver;
+@property (nonatomic, assign) BOOL wkObserverEnabled;
+
 @property (nonatomic, weak) id navigationDelegateReceiver;
 @property (nonatomic, weak) id UIDelegateReceiver;
 
@@ -287,13 +261,12 @@ NSArray* infoOpenURLs() {
     self.navigationDelegate = nil;
     self.UIDelegate = nil;
     self.wkObserver = [[WkObserver alloc] init];
-    self.wkObserver.webView = self;
     [self _allowsBackForwardNavigationGestures];
     [self _allowLongPressGestures];
 }
 
 -(void)dealloc {
-    self.wkObserver.enabled = NO;
+    self.wkObserverEnabled = NO;
     self.wkObserver = nil;
     self.backNavigationGesture = nil;
     self.forwardNavigationGesture = nil;
@@ -339,6 +312,32 @@ NSArray* infoOpenURLs() {
     [super addGestureRecognizer:gestureRecognizer];
 }
 
+
+-(void)setWkObserverEnabled:(BOOL)wkObserverEnabled {
+    if (_wkObserverEnabled == wkObserverEnabled) {
+        return;
+    }
+    _wkObserverEnabled = wkObserverEnabled;
+    if (_wkObserverEnabled) {
+        [self addObserver:self.wkObserver forKeyPath:kWebViewEstimatedProgress options:NSKeyValueObservingOptionNew context:nil];
+        [self addObserver:self.wkObserver forKeyPath:kWebViewCanGoBack options:NSKeyValueObservingOptionNew context:nil];
+        [self addObserver:self.wkObserver forKeyPath:kWebViewCanGoForward options:NSKeyValueObservingOptionNew context:nil];
+        [self addObserver:self.wkObserver forKeyPath:kWebViewTitle options:NSKeyValueObservingOptionNew context:nil];
+        [self addObserver:self.wkObserver forKeyPath:kWebViewUrl options:NSKeyValueObservingOptionNew context:nil];
+        [self addObserver:self.wkObserver forKeyPath:kWebViewLoading options:NSKeyValueObservingOptionNew context:nil];
+        [self addObserver:self.wkObserver forKeyPath:kWebViewCertificateChain options:NSKeyValueObservingOptionNew context:nil];
+        [self addObserver:self.wkObserver forKeyPath:kWebViewHasOnlySecureContent options:NSKeyValueObservingOptionNew context:nil];
+    }else{
+        [self removeObserver:self.wkObserver forKeyPath:kWebViewEstimatedProgress];
+        [self removeObserver:self.wkObserver forKeyPath:kWebViewCanGoBack];
+        [self removeObserver:self.wkObserver forKeyPath:kWebViewCanGoForward];
+        [self removeObserver:self.wkObserver forKeyPath:kWebViewTitle];
+        [self removeObserver:self.wkObserver forKeyPath:kWebViewUrl];
+        [self removeObserver:self.wkObserver forKeyPath:kWebViewLoading];
+        [self removeObserver:self.wkObserver forKeyPath:kWebViewCertificateChain];
+        [self removeObserver:self.wkObserver forKeyPath:kWebViewHasOnlySecureContent];
+    }
+}
 
 -(BOOL)allowsLinkPreview {
     if (([[[UIDevice currentDevice] systemVersion] doubleValue] >= 9.0)) {
@@ -395,7 +394,7 @@ NSArray* infoOpenURLs() {
 
 -(void)setObserverDelegate:(id<AYWKObserverDelegate>)observerDelegate {
     _observerDelegate = observerDelegate;
-    self.wkObserver.enabled = observerDelegate != nil;
+    self.wkObserverEnabled = observerDelegate != nil;
 }
 
 
@@ -523,10 +522,10 @@ NSArray* infoOpenURLs() {
 }
 
 - (BOOL)respondsToSelector:(SEL)aSelector {
-//    NSString*selName=NSStringFromSelector(aSelector);
-//    if ([selName hasPrefix:@"keyboardInput"] || [selName isEqualToString:@"customOverlayContainer"]) {//键盘输入代理过滤
-//        return NO;
-//    }
+    //    NSString*selName=NSStringFromSelector(aSelector);
+    //    if ([selName hasPrefix:@"keyboardInput"] || [selName isEqualToString:@"customOverlayContainer"]) {//键盘输入代理过滤
+    //        return NO;
+    //    }
     if (self.navigationDelegateReceiver && [self.navigationDelegateReceiver respondsToSelector:aSelector]) {
         return YES;
     }
