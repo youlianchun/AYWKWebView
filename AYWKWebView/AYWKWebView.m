@@ -463,10 +463,10 @@ NSArray* infoOpenURLs() {
     if([infoUrlSchemes() containsObject:url.scheme] ||
        [url.absoluteString containsString:@"itunes.apple.com"] ||
        [url.absoluteString isEqualToString:UIApplicationOpenSettingsURLString]) {
+        decisionHandler(WKNavigationActionPolicyCancel);
         dispatch_async(dispatch_get_main_queue(), ^{
             UIApplication *app = [UIApplication sharedApplication];
             if ([app canOpenURL:url]){
-                decisionHandler(WKNavigationActionPolicyCancel);
                 [app openURL:url];
             }
         });
