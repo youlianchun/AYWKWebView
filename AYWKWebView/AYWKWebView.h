@@ -35,21 +35,44 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored"-Wobjc-property-synthesis"
+@property (nonatomic) BOOL allowsBackForwardNavigationGestures NS_UNAVAILABLE;//分解为allowsBackNavigationGestures和allowsForwardNavigationGestures
 
-@property (nonatomic) BOOL allowsBackForwardNavigationGestures NS_UNAVAILABLE;
+/**
+ 3DTauch手势控制（重写增加版本控制）
+ */
 @property (nonatomic) BOOL allowsLinkPreview;
 #pragma clang diagnostic pop
 
 @property (nonatomic, weak) id <AYWKObserverDelegate> observerDelegate;
 
+/**
+ 侧滑后退手势控制
+ */
 @property (nonatomic) BOOL allowsBackNavigationGestures;
+
+/**
+ 侧滑前进手势控制
+ */
 @property (nonatomic) BOOL allowsForwardNavigationGestures;
 
+/**
+ 选择手势控制（长按页面文字或图片显示菜单）
+ */
 @property (nonatomic) BOOL allowSelectionGestures;
+
+/**
+ 长按手势控制（超链接长按）
+ */
 @property (nonatomic) BOOL allowLongPressGestures;
 
 -(id)stringByEvaluatingJavaScriptFromString:(NSString *)javaScriptString;
 
+/**
+ 当前截屏
+
+ @return <#return value description#>
+ */
 -(UIImage*)screenshot;
+
 + (void)clearCache;
 @end
