@@ -260,20 +260,11 @@ NSArray* infoOpenURLs() {
     self.navigationDelegate = nil;
     self.UIDelegate = nil;
     self.wkObserver = [[WkObserver alloc] init];
-    [super setAllowsBackForwardNavigationGestures:YES];
+    
     self.allowsBackNavigationGestures = YES;
     self.allowsForwardNavigationGestures = YES;
-    [self _allowLongPressGestures];
-}
-
--(void)dealloc {
-    self.wkObserverEnabled = NO;
-    self.wkObserver = nil;
-    self.backNavigationGesture = nil;
-    self.forwardNavigationGesture = nil;
-}
-
--(void)_allowLongPressGestures {
+    [super setAllowsBackForwardNavigationGestures:YES];//执行后会添加手势
+    
     self.allowSelectionGestures = YES;
     self.allowLongPressGestures = YES;
     UIView *wkContentView = self.scrollView.subviews.firstObject;
@@ -290,6 +281,13 @@ NSArray* infoOpenURLs() {
             }
         }
     }
+}
+
+-(void)dealloc {
+    self.wkObserverEnabled = NO;
+    self.wkObserver = nil;
+    self.backNavigationGesture = nil;
+    self.forwardNavigationGesture = nil;
 }
 
 -(void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
