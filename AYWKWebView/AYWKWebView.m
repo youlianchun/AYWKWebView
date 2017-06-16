@@ -119,7 +119,7 @@ Class k_UITextSelectionForceGesture_Class (){
         BOOL addIsSecureTextEntry = class_addMethod(class, isSecureTextEntry, (IMP)secureTextEntryIMP, "B@:");
         BOOL addSecureTextEntry = class_addMethod(class, secureTextEntry, (IMP)secureTextEntryIMP, "B@:");
         if (!addIsSecureTextEntry || !addSecureTextEntry) {
-            NSLog(@"WKContentView-Crash->修复失败");
+            NSLog(@"secureTextEntry-Crash->修复失败");
         }
     });
 }
