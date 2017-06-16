@@ -450,8 +450,8 @@ NSArray* infoOpenURLs() {
 }
 
 
-
-#pragma mark --
+#pragma mark -
+#pragma mark UrlSchemes OpenURLs拦截
 -(void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
     NSURL *url = navigationAction.request.URL;
     UIApplication *app = [UIApplication sharedApplication];
@@ -480,7 +480,7 @@ NSArray* infoOpenURLs() {
         decisionHandler(YES);
     }
 }
-
+#pragma mark  https
 - (void)webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential *))completionHandler {
     if ([self.navigationDelegateReceiver respondsToSelector:@selector(webView:didReceiveAuthenticationChallenge:completionHandler:)]) {
         [self.navigationDelegateReceiver webView:webView didReceiveAuthenticationChallenge:challenge completionHandler:completionHandler];
