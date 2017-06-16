@@ -65,6 +65,7 @@ static NSString*  kWebViewHasOnlySecureContent = @"hasOnlySecureContent";//æ ‡è¯
         return;
     }
 }
+
 @end
 
 
@@ -286,8 +287,6 @@ NSArray* infoOpenURLs() {
 -(void)dealloc {
     self.wkObserverEnabled = NO;
     self.wkObserver = nil;
-    self.backNavigationGesture = nil;
-    self.forwardNavigationGesture = nil;
 }
 
 -(void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
