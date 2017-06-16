@@ -72,7 +72,6 @@ static NSString*  kWebViewHasOnlySecureContent = @"hasOnlySecureContent";//æ ‡è¯
 
 @property (nonatomic, weak) UIScreenEdgePanGestureRecognizer *backNavigationGesture;
 @property (nonatomic, weak) UIScreenEdgePanGestureRecognizer *forwardNavigationGesture;
-@property (nonatomic, assign) BOOL allowsBackNavigationGesturesSet;
 
 @property (nonatomic, weak) UILongPressGestureRecognizer *selectionGesture;
 @property (nonatomic, weak) UILongPressGestureRecognizer *longPressGesture;
@@ -261,7 +260,7 @@ NSArray* infoOpenURLs() {
     self.navigationDelegate = nil;
     self.UIDelegate = nil;
     self.wkObserver = [[WkObserver alloc] init];
-    [self _allowsBackForwardNavigationGestures];
+    [super setAllowsBackForwardNavigationGestures:YES];
     [self _allowLongPressGestures];
 }
 
@@ -291,26 +290,19 @@ NSArray* infoOpenURLs() {
     }
 }
 
--(void)_allowsBackForwardNavigationGestures {
-    self.allowsBackNavigationGesturesSet = YES;
-    [super setAllowsBackForwardNavigationGestures:YES];
-    self.allowsBackNavigationGesturesSet = NO;
-}
-
 -(void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
-    if (self.allowsBackNavigationGesturesSet && [gestureRecognizer isKindOfClass:[UIScreenEdgePanGestureRecognizer class]]) {
+    if ([gestureRecognizer isKindOfClass:[UIScreenEdgePanGestureRecognizer class]] && [gestureRecognizer.description containsString:@"handleNavigationTransition:"]) {
         UIScreenEdgePanGestureRecognizer *navigationGestures = (UIScreenEdgePanGestureRecognizer*)gestureRecognizer;
         if (navigationGestures.edges == UIRectEdgeLeft) {
-            navigationGestures.enabled = self.backNavigationGesture.enabled;
             self.backNavigationGesture = navigationGestures;
         }
         if (navigationGestures.edges == UIRectEdgeRight) {
-            navigationGestures.enabled = self.forwardNavigationGesture.enabled;
             self.forwardNavigationGesture = navigationGestures;
         }
     }
     [super addGestureRecognizer:gestureRecognizer];
 }
+
 
 
 -(void)setWkObserverEnabled:(BOOL)wkObserverEnabled {
@@ -338,6 +330,12 @@ NSArray* infoOpenURLs() {
         [self removeObserver:self.wkObserver forKeyPath:kWebViewHasOnlySecureContent];
     }
 }
+-(void)setObserverDelegate:(id<AYWKObserverDelegate>)observerDelegate {
+    _observerDelegate = observerDelegate;
+    self.wkObserverEnabled = observerDelegate != nil;
+}
+
+#pragma mark -
 
 -(BOOL)allowsLinkPreview {
     if (([[[UIDevice currentDevice] systemVersion] doubleValue] >= 9.0)) {
@@ -352,49 +350,46 @@ NSArray* infoOpenURLs() {
     }
 }
 
--(BOOL)allowsBackNavigationGestures {
-    return  self.backNavigationGesture.enabled;
-}
 
+#pragma mark - Gestures
+#pragma mark backNavigationGesture
 -(void)setAllowsBackNavigationGestures:(BOOL)allowsBackNavigationGestures {
-    if (self.allowsBackNavigationGestures != allowsBackNavigationGestures) {
-        self.backNavigationGesture.enabled = allowsBackNavigationGestures;
-    }
+    _allowsBackNavigationGestures = allowsBackNavigationGestures;
+    self.backNavigationGesture.enabled = _allowsBackNavigationGestures;
+}
+-(void)setBackNavigationGesture:(UIScreenEdgePanGestureRecognizer *)backNavigationGesture {
+    _backNavigationGesture = backNavigationGesture;
+    _backNavigationGesture.enabled = self.allowsBackNavigationGestures;
 }
 
--(BOOL)allowsForwardNavigationGestures {
-    return self.forwardNavigationGesture.enabled;
-}
-
+#pragma mark forwardNavigationGesture
 -(void)setAllowsForwardNavigationGestures:(BOOL)allowsForwardNavigationGestures {
-    if (self.allowsForwardNavigationGestures != allowsForwardNavigationGestures) {
-        self.forwardNavigationGesture.enabled = allowsForwardNavigationGestures;
-    }
+    _allowsForwardNavigationGestures = allowsForwardNavigationGestures;
+    self.forwardNavigationGesture.enabled = _allowsForwardNavigationGestures;
+}
+-(void)setForwardNavigationGesture:(UIScreenEdgePanGestureRecognizer *)forwardNavigationGesture {
+    _forwardNavigationGesture = forwardNavigationGesture;
+    _forwardNavigationGesture.enabled = self.allowsForwardNavigationGestures;
 }
 
+#pragma mark selectionGesture
+-(void)setAllowSelectionGestures:(BOOL)allowSelectionGestures {
+    _allowSelectionGestures = allowSelectionGestures;
+    self.selectionGesture.enabled = _allowSelectionGestures;
+}
 -(void)setSelectionGesture:(UILongPressGestureRecognizer *)selectionGesture {
     _selectionGesture = selectionGesture;
     _selectionGesture.enabled = self.allowSelectionGestures;
 }
 
--(void)setLongPressGesture:(UILongPressGestureRecognizer *)longPressGesture {
-    _longPressGesture = longPressGesture;
-    _selectionGesture.enabled = self.allowLongPressGestures;
-}
-
--(void)setAllowSelectionGestures:(BOOL)allowSelectionGestures {
-    _allowSelectionGestures = allowSelectionGestures;
-    self.selectionGesture.enabled = _allowSelectionGestures;
-}
-
+#pragma mark longPressGesture
 -(void)setAllowLongPressGestures:(BOOL)allowLongPressGestures {
     _allowLongPressGestures = allowLongPressGestures;
     self.longPressGesture.enabled = _allowLongPressGestures;
 }
-
--(void)setObserverDelegate:(id<AYWKObserverDelegate>)observerDelegate {
-    _observerDelegate = observerDelegate;
-    self.wkObserverEnabled = observerDelegate != nil;
+-(void)setLongPressGesture:(UILongPressGestureRecognizer *)longPressGesture {
+    _longPressGesture = longPressGesture;
+    _selectionGesture.enabled = self.allowLongPressGestures;
 }
 
 
