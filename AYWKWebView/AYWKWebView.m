@@ -261,6 +261,8 @@ NSArray* infoOpenURLs() {
     self.UIDelegate = nil;
     self.wkObserver = [[WkObserver alloc] init];
     [super setAllowsBackForwardNavigationGestures:YES];
+    self.allowsBackNavigationGestures = YES;
+    self.allowsForwardNavigationGestures = YES;
     [self _allowLongPressGestures];
 }
 
