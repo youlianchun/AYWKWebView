@@ -217,12 +217,21 @@ NSArray* infoOpenURLs() {
 -(WKNavigation *)loadRequest:(NSURLRequest *)request {
     NSString *url = request.URL.absoluteString;
     NSString *str = [url lowercaseString];
-    BOOL loactionUrl = [str hasPrefix:@"/"] || [str hasPrefix:@"file://"];
-    if (loactionUrl) {
+    BOOL hasPrefix_var = [str hasPrefix:@"/"];
+    BOOL hasPrefix_file = [str hasPrefix:@"file://"];
+    if (hasPrefix_var || hasPrefix_file) {
+        NSURL *_url = request.URL;
+        if (hasPrefix_var) {
+            _url = [NSURL fileURLWithPath:url];
+        }
         if ([[UIDevice currentDevice].systemVersion floatValue] >= 9.0) {
-            return [self loadFileURL:request.URL allowingReadAccessToURL:request.URL];
+            return [self loadFileURL:_url allowingReadAccessToURL:_url];
         }else{
-            return [super loadRequest:request];
+            NSURLRequest *_request = request;
+            if (_url != _request.URL) {
+                _request = [NSURLRequest requestWithURL:_url];
+            }
+            return [super loadRequest:_request];
         }
     } else
         if ([[request.HTTPMethod uppercaseString] isEqualToString:@"POST"]){

@@ -27,8 +27,15 @@
     webView.allowsLinkPreview = NO;
     
     [self.view insertSubview:webView atIndex:0];
-    NSURL *url = [NSURL URLWithString:@"https://www.baidu.com"];
-    [webView loadRequest:[NSURLRequest requestWithURL:url]];
+    
+    NSURL *url_net = [NSURL URLWithString:@"https://www.baidu.com"];
+    
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"test.html" ofType:nil];
+    NSURL *url_path = [NSURL URLWithString:path];
+
+    NSURLRequest *request = [NSURLRequest requestWithURL:url_path];
+    [webView loadRequest:request];
+    
     
     // Do any additional setup after loading the view, typically from a nib.
 }
