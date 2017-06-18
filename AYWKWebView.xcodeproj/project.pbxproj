@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A9491EBA1EF6A03400252277 /* test.html in Resources */ = {isa = PBXBuildFile; fileRef = A9491EB91EF6A03400252277 /* test.html */; };
 		A9814B401EF386A700AE2E95 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A9814B3F1EF386A700AE2E95 /* main.m */; };
 		A9814B431EF386A700AE2E95 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A9814B421EF386A700AE2E95 /* AppDelegate.m */; };
 		A9814B461EF386A700AE2E95 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A9814B451EF386A700AE2E95 /* ViewController.m */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A9491EB91EF6A03400252277 /* test.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = test.html; sourceTree = "<group>"; };
 		A9814B3B1EF386A700AE2E95 /* AYWKWebView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AYWKWebView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9814B3F1EF386A700AE2E95 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A9814B411EF386A700AE2E95 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -67,6 +69,7 @@
 				A9814B421EF386A700AE2E95 /* AppDelegate.m */,
 				A9814B441EF386A700AE2E95 /* ViewController.h */,
 				A9814B451EF386A700AE2E95 /* ViewController.m */,
+				A9491EB91EF6A03400252277 /* test.html */,
 				A9814B471EF386A700AE2E95 /* Main.storyboard */,
 				A9814B4A1EF386A700AE2E95 /* Assets.xcassets */,
 				A9814B4C1EF386A700AE2E95 /* LaunchScreen.storyboard */,
@@ -142,6 +145,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9491EBA1EF6A03400252277 /* test.html in Resources */,
 				A9814B4E1EF386A700AE2E95 /* LaunchScreen.storyboard in Resources */,
 				A9814B4B1EF386A700AE2E95 /* Assets.xcassets in Resources */,
 				A9814B491EF386A700AE2E95 /* Main.storyboard in Resources */,
@@ -317,6 +321,7 @@
 				A9814B541EF386A700AE2E95 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
