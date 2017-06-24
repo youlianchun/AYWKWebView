@@ -10,7 +10,7 @@
 #import <objc/runtime.h>
 
 //void set_Associated(id target, NSString *propertyName, id value) {
-//    objc_setAssociatedObject(target, NSSelectorFromString(propertyName), value, OBJC_ASSOCIATION_ASSIGN);
+//    objc_setAssociatedObject(target, NSSelectorFromString(propertyName), value, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 //}
 //id get_Associated(id target, NSString *propertyName) {
 //    return objc_getAssociatedObject(target, NSSelectorFromString(propertyName));
@@ -74,6 +74,10 @@ static NSString*  kWebViewHasOnlySecureContent = @"hasOnlySecureContent";//标�
 @property (nonatomic, weak) UIScreenEdgePanGestureRecognizer *backNavigationGesture;
 @property (nonatomic, weak) UIScreenEdgePanGestureRecognizer *forwardNavigationGesture;
 
+
+
+@property (nonatomic, weak) UIGestureRecognizer *webTouchEventsGesture;
+
 @property (nonatomic, weak) UILongPressGestureRecognizer *selectionGesture;
 @property (nonatomic, weak) UILongPressGestureRecognizer *longPressGesture;
 
@@ -86,6 +90,7 @@ static NSString*  kWebViewHasOnlySecureContent = @"hasOnlySecureContent";//标�
 @end
 
 
+
 @implementation UIView (WKContentView)
 
 static NSString *kLongPressRecognizedFlag = @"_longPressRecognized:";
@@ -94,6 +99,14 @@ Class k_UITextSelectionForceGesture_Class (){
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         cls = NSClassFromString(@"_UITextSelectionForceGesture");
+    });
+    return cls;
+}
+Class k_UIWebTouchEventsGestureRecognizer_Class (){
+    static Class cls;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        cls = NSClassFromString(@"UIWebTouchEventsGestureRecognizer");
     });
     return cls;
 }
@@ -138,6 +151,8 @@ BOOL secureTextEntryIMP(id sender, SEL cmd) {
             }else if ([gestureRecognizer.description containsString:kLongPressRecognizedFlag]) {
                 webView.longPressGesture = (UILongPressGestureRecognizer*)gestureRecognizer;
             }
+        }else if ([gestureRecognizer isKindOfClass:k_UIWebTouchEventsGestureRecognizer_Class()]) {
+            webView.webTouchEventsGesture = gestureRecognizer;
         }
     }
     [self wkContentView_addGestureRecognizer:gestureRecognizer];
@@ -270,16 +285,17 @@ NSArray* infoOpenURLs() {
     self.allowLongPressGestures = YES;
     UIView *wkContentView = self.scrollView.subviews.firstObject;
     NSArray *gestureRecognizers = wkContentView.gestureRecognizers;
-    for (long i = gestureRecognizers.count-1, n = 0; i>0 && n <= 2; i--) {
+    for (long i = 0; i<gestureRecognizers.count; i++) {
         UIGestureRecognizer *gestureRecognizer = gestureRecognizers[i];
+        NSLog(@"11: %@",[gestureRecognizer class]);
         if ([gestureRecognizer isKindOfClass:[UILongPressGestureRecognizer class]] ) {
             if ([gestureRecognizer isKindOfClass:k_UITextSelectionForceGesture_Class()] ) {
                 self.selectionGesture = (UILongPressGestureRecognizer*)gestureRecognizer;
-                n++;
             }else if ([gestureRecognizer.description containsString:kLongPressRecognizedFlag]) {
                 self.longPressGesture = (UILongPressGestureRecognizer*)gestureRecognizer;
-                n++;
             }
+        }else if ([gestureRecognizer isKindOfClass:k_UIWebTouchEventsGestureRecognizer_Class()]) {
+            self.webTouchEventsGesture = gestureRecognizer;
         }
     }
 }
@@ -391,7 +407,12 @@ NSArray* infoOpenURLs() {
     _selectionGesture.enabled = self.allowLongPressGestures;
 }
 
+#pragma mark - webTouchEventsGesture
 
+-(void)setWebTouchEventsGesture:(UIGestureRecognizer *)webTouchEventsGesture {
+    _webTouchEventsGesture = webTouchEventsGesture;
+    //...
+}
 
 #pragma mark - 滚动速率
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
@@ -558,6 +579,7 @@ NSArray* infoOpenURLs() {
     UIGraphicsEndImageContext();
     return image;
 }
+
 
 
 #pragma mark - class
