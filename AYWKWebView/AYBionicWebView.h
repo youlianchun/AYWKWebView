@@ -8,7 +8,7 @@
 
 #import "AYWKWebView.h"
 
-#define AYWKWebView_bionicEnabled 1 //导航条样式开关，由于涉及私有代理协议，若审核失败改为0即可
+#define AYWKWebView_bionicEnabled 1 //导航条样式开关，由于涉及私有代理协议，若审核失败改为0即可(项目审核已通过，以防万一)
 
 @interface AYBionicWebView : AYWKWebView
 

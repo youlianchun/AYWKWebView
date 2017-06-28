@@ -9,6 +9,33 @@
 #import "AYWKWebView.h"
 #import <objc/runtime.h>
 
+void aywkobjc_setAssociated(id target, SEL property, id value , BOOL retain) {
+    objc_setAssociatedObject(target, property, value, retain?OBJC_ASSOCIATION_RETAIN_NONATOMIC:OBJC_ASSOCIATION_ASSIGN);
+}
+
+id aywkobjc_getAssociated(id target, SEL property) {
+    return objc_getAssociatedObject(target, property);
+}
+
+void aywkw_setAssociated(id target, NSString *propertyName, id value , BOOL retain) {
+    objc_setAssociatedObject(target, NSSelectorFromString(propertyName), value, retain?OBJC_ASSOCIATION_RETAIN_NONATOMIC:OBJC_ASSOCIATION_ASSIGN);
+}
+
+id aywkw_getAssociated(id target, NSString *propertyName) {
+    return objc_getAssociatedObject(target, NSSelectorFromString(propertyName));
+}
+
+void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector) {
+    Method oriMethod = class_getInstanceMethod(class, originSelector);
+    Method newMethod = class_getInstanceMethod(class, newSelector);
+    BOOL isAddedMethod = class_addMethod(class, originSelector, method_getImplementation(newMethod), method_getTypeEncoding(newMethod));
+    if (isAddedMethod) {
+        class_replaceMethod(class, newSelector, method_getImplementation(oriMethod), method_getTypeEncoding(oriMethod));
+    } else {
+        method_exchangeImplementations(oriMethod, newMethod);
+    }
+}
+
 static NSString*  kWebViewEstimatedProgress = @"estimatedProgress";
 static NSString*  kWebViewCanGoBack = @"canGoBack";
 static NSString*  kWebViewCanGoForward = @"canGoForward";
@@ -77,8 +104,6 @@ static NSString*  kWebViewHasOnlySecureContent = @"hasOnlySecureContent";//æ ‡è¯
 @property (nonatomic, weak) UIScreenEdgePanGestureRecognizer *backNavigationGesture;
 @property (nonatomic, weak) UIScreenEdgePanGestureRecognizer *forwardNavigationGesture;
 
-
-
 @property (nonatomic, weak) UIGestureRecognizer *webTouchEventsGesture;
 
 @property (nonatomic, weak) UILongPressGestureRecognizer *selectionGesture;
@@ -91,7 +116,6 @@ static NSString*  kWebViewHasOnlySecureContent = @"hasOnlySecureContent";//æ ‡è¯
 @property (nonatomic, weak) id UIDelegateReceiver;
 
 @end
-
 
 
 @implementation UIView (WKContentView)
@@ -119,16 +143,7 @@ Class k_UIWebTouchEventsGestureRecognizer_Class (){
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         Class class = NSClassFromString(@"WKContentView");
-        SEL originalSelector = @selector(addGestureRecognizer:);
-        SEL swizzledSelector = @selector(wkContentView_addGestureRecognizer:);
-        Method originalMethod = class_getInstanceMethod(class, originalSelector);
-        Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
-        BOOL success = class_addMethod(class, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod));
-        if (success) {
-            class_replaceMethod(class, swizzledSelector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
-        } else {
-            method_exchangeImplementations(originalMethod, swizzledMethod);
-        }
+        aywkw_replaceMethod(class, @selector(addGestureRecognizer:), @selector(wkContentView_addGestureRecognizer:));
         
         SEL isSecureTextEntry = NSSelectorFromString(@"isSecureTextEntry");
         SEL secureTextEntry = NSSelectorFromString(@"secureTextEntry");
