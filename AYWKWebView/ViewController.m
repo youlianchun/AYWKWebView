@@ -17,6 +17,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     AYWKWebView *webView = [[AYWKWebView alloc] initWithFrame:self.view.bounds configuration:configuration];
     
@@ -42,6 +43,7 @@
 
     NSURLRequest *request = [NSURLRequest requestWithURL:url_net];
     [webView loadRequest:request];
+    
     
     
     // Do any additional setup after loading the view, typically from a nib.

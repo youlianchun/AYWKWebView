@@ -9,13 +9,6 @@
 #import "AYWKWebView.h"
 #import <objc/runtime.h>
 
-//void set_Associated(id target, NSString *propertyName, id value) {
-//    objc_setAssociatedObject(target, NSSelectorFromString(propertyName), value, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-//}
-//id get_Associated(id target, NSString *propertyName) {
-//    return objc_getAssociatedObject(target, NSSelectorFromString(propertyName));
-//}
-
 static NSString*  kWebViewEstimatedProgress = @"estimatedProgress";
 static NSString*  kWebViewCanGoBack = @"canGoBack";
 static NSString*  kWebViewCanGoForward = @"canGoForward";
@@ -277,12 +270,12 @@ NSArray* infoOpenURLs() {
 -(instancetype)initWithFrame:(CGRect)frame configuration:(WKWebViewConfiguration *)configuration {
     self = [super initWithFrame:frame configuration:configuration];
     if (self) {
-        [self customIntitialization];
+        [self _customIntitialization];
     }
     return self;
 }
 
-- (void)customIntitialization{
+- (void)_customIntitialization{
     self.navigationDelegate = nil;
     self.UIDelegate = nil;
     self.wkObserver = [[WkObserver alloc] init];
@@ -297,7 +290,6 @@ NSArray* infoOpenURLs() {
     NSArray *gestureRecognizers = wkContentView.gestureRecognizers;
     for (long i = 0; i<gestureRecognizers.count; i++) {
         UIGestureRecognizer *gestureRecognizer = gestureRecognizers[i];
-        NSLog(@"11: %@",[gestureRecognizer class]);
         if ([gestureRecognizer isKindOfClass:[UILongPressGestureRecognizer class]] ) {
             if ([gestureRecognizer isKindOfClass:k_UITextSelectionForceGesture_Class()] ) {
                 self.selectionGesture = (UILongPressGestureRecognizer*)gestureRecognizer;
