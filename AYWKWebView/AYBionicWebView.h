@@ -8,6 +8,8 @@
 
 #import "AYWKWebView.h"
 
+#define AYWKWebView_bionicEnabled 1 //导航条样式开关，由于涉及私有代理协议，若审核失败改为0即可
+
 @interface AYBionicWebView : AYWKWebView
 
 #pragma clang diagnostic push

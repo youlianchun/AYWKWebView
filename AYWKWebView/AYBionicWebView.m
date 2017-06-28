@@ -15,8 +15,6 @@
 @end
 @interface AYBionicWebView ()
 @property (nonatomic, weak) UIViewController *viewController;
-//@property (nonatomic, strong) UIImageView *transitionImageView;
-
 @end
 
 CG_INLINE void aybw_setAssociated(id target, NSString *propertyName, id value , BOOL retain) {
@@ -38,13 +36,13 @@ CG_INLINE void aybw_replaceMethod(Class _class, SEL _originSelector, SEL _newSel
     }
 }
 
+#if AYWKWebView_bionicEnabled
 
-
-@interface WKBackForwardListItem (transitionContext_ContainerView)
+@interface WKBackForwardListItem (AYBionicWebView)
 @property (nonatomic, strong) UINavigationBar *navigationBar;
 -(void)navigationBarWithLeftItems:(NSArray<UIBarButtonItem*>*)leftItems rightItems:(NSArray<UIBarButtonItem*>*)rightItems;
 @end
-@implementation WKBackForwardListItem (transitionContext_ContainerView)
+@implementation WKBackForwardListItem (AYBionicWebView)
 -(UINavigationBar *)navigationBar {
     return objc_getAssociatedObject(self, @selector(navigationBar));
 }
@@ -61,54 +59,22 @@ CG_INLINE void aybw_replaceMethod(Class _class, SEL _originSelector, SEL _newSel
 }
 @end
 
-
-//static UINavigationBar *kNavigationBar;
 static BOOL kTransition_ing = NO;
-
-//@implementation NSObject (WKSwipeTransition)
-//static BOOL kTransition_doCompletio = NO;
-//+(void)load {
-//    static dispatch_once_t onceToken;
-//    dispatch_once(&onceToken, ^{
-//        Class class = NSClassFromString(@"_UIViewControllerOneToOneTransitionContext");
-//        aybw_replaceMethod(class, NSSelectorFromString(@"_setCompletionHandler:"), NSSelectorFromString(@"f_setCompletionHandler:"));
-//    });
-//}
-//-(void)f_setCompletionHandler:(void(^)(id context, BOOL didComplete))handler {
-//    if (kTransition_ing) {
-//        [self f_setCompletionHandler:^(id context, BOOL didComplete) {
-//            if (!didComplete) {
-//                kNavigationBar = nil;
-//            }
-//            NSLog(@"f_setCompletionHandler ");
-////            kTransition_doCompletio = YES;
-//            handler(context,didComplete);
-////            kTransition_doCompletio = NO;
-////            kTransition_ing = NO;
-//        }];
-//    }else {
-//        [self f_setCompletionHandler:handler];
-//    }
-//}
-//@end
-
-
+static BOOL kNavigationBarExist = NO;
 static NSUInteger const kTransitionTag = 110192312;
 
-@implementation UIView (transitionContext_ContainerView)
+@implementation UIView (AYBionicWebView)
 +(void)load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         Class class = [UIView class];
-        aybw_replaceMethod(class, @selector(addSubview:), @selector(transition_addSubview:));
-//        aybw_replaceMethod(class, @selector(removeFromSuperview), @selector(transition_removeFromSuperview));
-        
+        aybw_replaceMethod(class, @selector(addSubview:), @selector(bionic_addSubview:));
     });
 }
 
--(void)transition_addSubview:(UIView *)view {
-    [self transition_addSubview:view];
-    if (kTransition_ing) {
+-(void)bionic_addSubview:(UIView *)view {
+    [self bionic_addSubview:view];
+    if (kNavigationBarExist && kTransition_ing) {
         if([self class] == [UIView class]) {
             [self addTransitionNavigationBarInViewIfNeeded:view];
         }
@@ -123,24 +89,6 @@ static NSUInteger const kTransitionTag = 110192312;
         }
     }
 }
-
-//-(void)transition_removeFromSuperview {
-//    [self transition_removeFromSuperview];
-//    if (self.tag == kTransitionTag && kTransition_ing) {
-//        AYBionicWebView *webView = aybw_getAssociated(self, @"rootWKWebView");
-//        aybw_setAssociated(self, @"rootWKWebView", nil, NO);
-//        webView.viewController.navigationController.navigationBar.alpha = 1;
-////        if (kNavigationBar) {
-////            webView.viewController.title = kNavigationBar.items[0].title;
-////            kNavigationBar = nil;
-////        }
-//        kTransition_ing = NO;
-//        NSLog(@"WkWebView transition_end");
-//    }
-//    if (self.tag == 110) {
-//        NSLog(@"");
-//    }
-//}
 
 - (void)addTransitionNavigationBarInViewIfNeeded:(UIView*)view {
     if (self.tag == kTransitionTag) {
@@ -159,7 +107,6 @@ static NSUInteger const kTransitionTag = 110192312;
                 }
                 
                 BOOL isFront;//YES 上层; NO 底层
-                
                 if ([sView isKindOfClass:NSClassFromString(@"_UIParallaxDimmingView")] && [sView.subviews.firstObject isKindOfClass:[UIImageView class]]) {
                     UIImageView *imageView = sView.subviews.firstObject;
                     CGRect frame = imageView.frame;
@@ -172,18 +119,15 @@ static NSUInteger const kTransitionTag = 110192312;
                 }
                 
                 WKBackForwardListItem *backForwardItem;
-//                BOOL netSet_kNavigationBar = NO;
                 if (isGoBack) {
                     if (isFront) {
                         backForwardItem = webView.backForwardList.currentItem;
                     }else{
                         backForwardItem = webView.backForwardList.backItem;
-//                        netSet_kNavigationBar = YES;
                     }
                 }else{
                     if (isFront) {
                         backForwardItem = webView.backForwardList.forwardItem;
-//                        netSet_kNavigationBar = YES;
                     }else{
                         backForwardItem = webView.backForwardList.currentItem;
                     }
@@ -199,11 +143,7 @@ static NSUInteger const kTransitionTag = 110192312;
                     backForwardItem.navigationBar = customBar;
                 }
                 
-//                if (netSet_kNavigationBar) {
-////                  kNavigationBar = customBar;
-//                    UIImage* image = [self imageWithUIView:panelView];
-//                    [[NSNotificationCenter defaultCenter] postNotificationName:@"transitionImageNotification" object:image];
-//                }
+//              UIImage* image = [self imageWithUIView:panelView];
                 
                 if (customBar.barStyle != originBar.barStyle) {
                     customBar.barStyle = originBar.barStyle;
@@ -239,8 +179,7 @@ static NSUInteger const kTransitionTag = 110192312;
 //    return image;
 //}
 @end
-
-
+#endif
 
 @implementation AYBionicWebView
 
@@ -251,16 +190,12 @@ static NSUInteger const kTransitionTag = 110192312;
     }
     return self;
 }
--(void)dealloc {
-//    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"transitionImageNotification" object:nil];
-}
+
 - (void)customIntitialization {
     super.allowsLinkPreview = NO;
     super.allowsForwardNavigationGestures = NO;
     super.allowSelectionGestures = NO;
     super.allowLongPressGestures = NO;
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(transitionImageNotification:) name:@"transitionImageNotification" object:nil];
-
 }
 
 -(UIViewController *)viewController {
@@ -277,28 +212,15 @@ static NSUInteger const kTransitionTag = 110192312;
     return _viewController;
 }
 
+#if AYWKWebView_bionicEnabled
 -(void)insertSubview:(UIView *)view belowSubview:(UIView *)siblingSubview {
-    if (kTransition_ing || self.backNavigationGesture.state == UIGestureRecognizerStateBegan || self.forwardNavigationGesture.state == UIGestureRecognizerStateBegan) {
+    if (kNavigationBarExist && (kTransition_ing || self.backNavigationGesture.state == UIGestureRecognizerStateBegan || self.forwardNavigationGesture.state == UIGestureRecognizerStateBegan)) {
         view.tag = kTransitionTag;
         aybw_setAssociated(view, @"rootWKWebView", self, NO);
         self.viewController.navigationController.navigationBar.alpha = 0;
     }
     [super insertSubview:view belowSubview:siblingSubview];
 }
-
-
-//-(UIImageView *)transitionImageView {
-//    if (!_transitionImageView) {
-//        _transitionImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 65)];
-//        [self addSubview:_transitionImageView];
-//        //        _transitionImageView.alpha = 0.5;
-//    }
-//    return _transitionImageView;
-//}
-
-//-(void)transitionImageNotification:(NSNotification *)notification {
-//    self.transitionImageView.image = notification.object;
-//}
 
 - (void)_webViewDidEndNavigationGesture:(WKWebView *)webView withNavigationToBackForwardListItem:(WKBackForwardListItem *)item {
 #pragma clang diagnostic push
@@ -310,6 +232,7 @@ static NSUInteger const kTransitionTag = 110192312;
         self.viewController.title = item.title;
     }
     self.viewController.navigationController.navigationBar.alpha = 1;
+    kNavigationBarExist = NO;
     NSLog(@"WkWebView transition_end");
 }
 
@@ -319,8 +242,9 @@ static NSUInteger const kTransitionTag = 110192312;
     [self.navigationDelegate performSelector:_cmd withObject:webView];
 #pragma clang diagnostic pop
     kTransition_ing = YES;
+    kNavigationBarExist = self.viewController.navigationController && !self.viewController.navigationController.navigationBarHidden;
+
     NSLog(@"WkWebView transition_begin");
 }
-
-
+#endif
 @end
