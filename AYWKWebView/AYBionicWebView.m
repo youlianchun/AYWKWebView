@@ -86,12 +86,12 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
 
 @end
 
-static NSArray<UINavigationItem*> *kTransitionItem_t;
-static NSArray<UINavigationItem*> *kTransitionItem_b;
+static NSArray<UINavigationItem*> *kTransitionItem_t;//顶部导航栏items
+static NSArray<UINavigationItem*> *kTransitionItem_b;//底部导航栏items
 
 static BOOL kTransition_ing = NO;//YES:转场正在执行
 static BOOL kNavigationBarExist = NO;//YES:导航栏存在且显示
-static NSUInteger const kTransitionTag = 110192312;//tag值，用于标记from、to转场试图superview
+static NSUInteger const kTransitionTag = 110192312;//tag值，用于标记from、to转场视图superview
 
 Class k_UIParallaxDimmingView_Class (){
     static Class cls;
@@ -148,7 +148,7 @@ Class k_UIParallaxDimmingView_Class (){
                 
                 BOOL isFront;//YES 上层; NO 底层
                 if ([sView isKindOfClass:k_UIParallaxDimmingView_Class()] && [sView.subviews.firstObject isKindOfClass:[UIImageView class]]) {//转场视图结构特性，为_UIParallaxDimmingView且第一个子视图是UIImageView时候是上层转场视图
-                    UIImageView *imageView = sView.subviews.firstObject;//转场过程中的阴影imageView（丢改frame覆盖导航条区域）
+                    UIImageView *imageView = sView.subviews.firstObject;//转场过程中的阴影imageView（修改frame覆盖导航条区域）
                     CGRect frame = imageView.frame;
                     frame.origin.y -= 64;
                     frame.size.height += 64;
@@ -222,7 +222,7 @@ Class k_UIParallaxDimmingView_Class (){
             CGRect frame = view.frame;//底层阴影浮层视图
             frame.origin.y -= 64;
             frame.size.height += 64;
-            view.frame = frame;//转场过程中的阴影浮层（丢改frame覆盖导航条区域）
+            view.frame = frame;//转场过程中的阴影浮层（修改frame覆盖导航条区域）
         }
     }
 }
@@ -236,7 +236,6 @@ Class k_UIParallaxDimmingView_Class (){
 }
 
 @end
-//#endif
 
 @implementation AYBionicWebView
 
