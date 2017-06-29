@@ -17,6 +17,7 @@
 		A9814B571EF386BA00AE2E95 /* AYWKWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = A9814B561EF386BA00AE2E95 /* AYWKWebView.m */; };
 		A9B3E4E21F03466800DF90BA /* AYBionicWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = A9B3E4E11F03466800DF90BA /* AYBionicWebView.m */; };
 		A9B3E4EB1F0349A500DF90BA /* BionicViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A9B3E4EA1F0349A500DF90BA /* BionicViewController.m */; };
+		A9FA9F1C1F04E4DE00502005 /* UIBarButtonItem+Back.m in Sources */ = {isa = PBXBuildFile; fileRef = A9FA9F1B1F04E4DE00502005 /* UIBarButtonItem+Back.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +38,8 @@
 		A9B3E4E11F03466800DF90BA /* AYBionicWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYBionicWebView.m; sourceTree = "<group>"; };
 		A9B3E4E91F0349A500DF90BA /* BionicViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BionicViewController.h; sourceTree = "<group>"; };
 		A9B3E4EA1F0349A500DF90BA /* BionicViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BionicViewController.m; sourceTree = "<group>"; };
+		A9FA9F1A1F04E4DE00502005 /* UIBarButtonItem+Back.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIBarButtonItem+Back.h"; sourceTree = "<group>"; };
+		A9FA9F1B1F04E4DE00502005 /* UIBarButtonItem+Back.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBarButtonItem+Back.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +76,8 @@
 				A9814B561EF386BA00AE2E95 /* AYWKWebView.m */,
 				A9B3E4E01F03466800DF90BA /* AYBionicWebView.h */,
 				A9B3E4E11F03466800DF90BA /* AYBionicWebView.m */,
+				A9FA9F1A1F04E4DE00502005 /* UIBarButtonItem+Back.h */,
+				A9FA9F1B1F04E4DE00502005 /* UIBarButtonItem+Back.m */,
 				A9814B411EF386A700AE2E95 /* AppDelegate.h */,
 				A9814B421EF386A700AE2E95 /* AppDelegate.m */,
 				A9814B441EF386A700AE2E95 /* ViewController.h */,
@@ -172,6 +177,7 @@
 				A9814B461EF386A700AE2E95 /* ViewController.m in Sources */,
 				A9B3E4E21F03466800DF90BA /* AYBionicWebView.m in Sources */,
 				A9B3E4EB1F0349A500DF90BA /* BionicViewController.m in Sources */,
+				A9FA9F1C1F04E4DE00502005 /* UIBarButtonItem+Back.m in Sources */,
 				A9814B571EF386BA00AE2E95 /* AYWKWebView.m in Sources */,
 				A9814B431EF386A700AE2E95 /* AppDelegate.m in Sources */,
 				A9814B401EF386A700AE2E95 /* main.m in Sources */,
