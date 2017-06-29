@@ -36,13 +36,13 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
 
 @implementation NSString (AYBionicWebView)
 
-+ (NSString *) uuidString {
-    uuid_t uuid;
-    uuid_generate(uuid);
-    char buffer[37] = {0};
-    uuid_unparse_upper(uuid, buffer);
-    return [NSString stringWithUTF8String:buffer];
-}
+//+ (NSString *) uuidString {
+//    uuid_t uuid;
+//    uuid_generate(uuid);
+//    char buffer[37] = {0};
+//    uuid_unparse_upper(uuid, buffer);
+//    return [NSString stringWithUTF8String:buffer];
+//}
 
 - (NSString *)md5 {
     const char *cStr = [self UTF8String];
@@ -284,7 +284,7 @@ Class k_UIParallaxDimmingView_Class (){
 }
 
 
-#if AYWKWebView_bionicEnabled
+
 -(void)insertSubview:(UIView *)view belowSubview:(UIView *)siblingSubview {
     if (kNavigationBarExist && (kTransition_ing || self.backNavigationGesture.state == UIGestureRecognizerStateBegan || self.forwardNavigationGesture.state == UIGestureRecognizerStateBegan)) {//可以使设置导航条跟随效果时候insertSubview了转场视图（导航条存在且正在显示，转场开始）
         view.tag = kTransitionTag;//为转场视图做标记
@@ -334,7 +334,6 @@ Class k_UIParallaxDimmingView_Class (){
     self.canUpdateNavigationItem = NO;
     NSLog(@"WkWebView transition_begin %@",self.backForwardList.currentItem.title);
 }
-#endif
 
 @end
 
