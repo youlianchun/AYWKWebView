@@ -18,8 +18,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    NSArray *oItems = self.navigationController.navigationBar.items;
     
     UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:@""];
     
@@ -27,15 +25,12 @@
     item.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"tool" style:UIBarButtonItemStylePlain target:nil action:nil];
     self.navigationController.navigationBar.items = [NSArray arrayWithObject:item];
 
-//    return;
 
     self.navigationController.navigationBar.translucent = NO;
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     AYBionicWebView *webView = [[AYBionicWebView alloc] initWithFrame:self.view.bounds configuration:configuration];
     self.webView = webView;
     webView.allowsBackNavigationGestures = YES;
-    webView.observerDelegate = self;
-    webView.navigationDelegate = self;
     
     [self.view insertSubview:webView atIndex:0];
 
@@ -47,39 +42,9 @@
     NSURLRequest *request = [NSURLRequest requestWithURL:url_net];
     [webView loadRequest:request];
 
-    
-//    CGRect frame = self.view.bounds;
-//    frame.size.width /= 2.0;
-//    frame.origin.x += frame.size.width;
-//    UIView *view = [[UIView alloc] initWithFrame:frame];
-//    view.backgroundColor = [UIColor redColor];
-//    view.alpha = 0.5;
-//    [self.view addSubview:view];
-    // Do any additional setup after loading the view.
+
 }
 
-- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
-    decisionHandler(WKNavigationActionPolicyAllow);
-}
-
--(void)webView:(WKWebView *)webView titleChange:(NSString *)title {
-//    self.title = title;
-//    self.webView.nTitle = title;
-//    if (self.webView.canUpdateNavigationItem) {
-//        self.navigationController.navigationBar.items.lastObject.title = title;
-//    }
-}
-//-(void)webView:(WKWebView *)webView urlChange:(NSURL *)url {
-//    if (self.webView.canUpdateNavigationItem) {
-//        if ([url.absoluteString  isEqualToString:self.webView.backForwardList.currentItem.URL.absoluteString]) {
-//            self.webView.navigationItem.title = self.webView.backForwardList.currentItem.title;
-//        }else{
-//            NSLog(@"");
-//        }
-//    }else{
-//        
-//    }
-//}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

@@ -7,6 +7,10 @@
 //
 
 #import "AYBionicWebView.h"
+#if AYWKWebView_bionicEnabled
+#pragma mark -
+#pragma mark - ------ bionicEnabled ==1
+#pragma mark -
 #import<CommonCrypto/CommonDigest.h>
 
 #pragma mark -
@@ -337,8 +341,54 @@ Class k_UIParallaxDimmingView_Class (){
 
 @end
 
+#else
 #pragma mark -
-#pragma mark - Test
+#pragma mark - ------ bionicEnabled == 0
+#pragma mark -
+
+@interface AYBionicWebView ()
+@property (nonatomic, weak) UIViewController *viewController;
+@end
+@implementation AYBionicWebView
+
+-(instancetype)initWithFrame:(CGRect)frame configuration:(WKWebViewConfiguration *)configuration {
+    self = [super initWithFrame:frame configuration:configuration];
+    if (self) {
+        [self customIntitialization];
+    }
+    return self;
+}
+
+- (void)customIntitialization {
+    super.allowsLinkPreview = NO;
+    super.allowsForwardNavigationGestures = NO;
+    super.allowSelectionGestures = NO;
+    super.allowLongPressGestures = NO;
+}
+
+-(UIViewController *)viewController {
+    if (!_viewController) {
+        id target=self;
+        while (target) {
+            target = ((UIResponder *)target).nextResponder;
+            if ([target isKindOfClass:[UIViewController class]]) {
+                break;
+            }
+        }
+        _viewController = target;
+    }
+    return _viewController;
+}
+
+-(void)webView:(WKWebView *)webView titleChange:(NSString *)title {
+    self.viewController.navigationController.navigationBar.items.lastObject.title = title;
+    if ([self.observerDelegate respondsToSelector:_cmd]) {
+        [self.observerDelegate webView:self titleChange:title];
+    }
+}
+@end
+
+#endif
 
 
 
