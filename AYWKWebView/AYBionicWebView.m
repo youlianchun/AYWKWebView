@@ -30,7 +30,6 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
 #pragma mark -
 #pragma mark - AYBionicWebView
 
-
 @interface AYBionicWebView ()
 @property (nonatomic, weak) UIViewController *viewController;
 @property (nonatomic, strong) NSMutableDictionary <NSString*, NSArray<UINavigationItem*>*> *navigationItemsDict;
@@ -51,7 +50,7 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
 - (NSString *)md5 {
     const char *cStr = [self UTF8String];
     unsigned char digest[CC_MD5_DIGEST_LENGTH];
-    CC_MD5( cStr, strlen(cStr), digest ); // This is the md5 call
+    CC_MD5( cStr, (CC_LONG)strlen(cStr), digest ); // This is the md5 call
     NSMutableString *output = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
     for(int i = 0; i < CC_MD5_DIGEST_LENGTH; i++)
         [output appendFormat:@"%02x", digest[i]];
