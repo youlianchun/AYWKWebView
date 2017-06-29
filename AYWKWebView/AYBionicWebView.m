@@ -7,6 +7,7 @@
 //
 
 #import "AYBionicWebView.h"
+#import<CommonCrypto/CommonDigest.h>
 
 #pragma mark -
 #pragma mark - super
@@ -19,36 +20,71 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
 @interface AYWKWebView ()
 @property (nonatomic, weak, readonly) UIScreenEdgePanGestureRecognizer *backNavigationGesture;
 @property (nonatomic, weak, readonly) UIScreenEdgePanGestureRecognizer *forwardNavigationGesture;
+-(void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler;
 @end
 
 #pragma mark -
 #pragma mark - AYBionicWebView
+
+
 @interface AYBionicWebView ()
 @property (nonatomic, weak) UIViewController *viewController;
+@property (nonatomic, strong) NSMutableDictionary <NSString*, NSArray<UINavigationItem*>*> *navigationItemsDict;
+@property (nonatomic, assign) BOOL canUpdateNavigationItem;
 @end
 
-#if AYWKWebView_bionicEnabled
-//为每个WKBackForwardListItem添加一个UINavigationBar属性（拥有各自导航条）
+
+@implementation NSString (AYBionicWebView)
+
++ (NSString *) uuidString {
+    uuid_t uuid;
+    uuid_generate(uuid);
+    char buffer[37] = {0};
+    uuid_unparse_upper(uuid, buffer);
+    return [NSString stringWithUTF8String:buffer];
+}
+
+- (NSString *)md5 {
+    const char *cStr = [self UTF8String];
+    unsigned char digest[CC_MD5_DIGEST_LENGTH];
+    CC_MD5( cStr, strlen(cStr), digest ); // This is the md5 call
+    NSMutableString *output = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
+    for(int i = 0; i < CC_MD5_DIGEST_LENGTH; i++)
+        [output appendFormat:@"%02x", digest[i]];
+    return  output;
+}
+@end
+
+@implementation UINavigationBar (AYBionicWebView)
+
+-(void)setTitle:(NSString*)title {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [self performSelector:@selector(_setTitle:) withObject:title afterDelay:0.4];
+}
+
+-(void)_setTitle:(NSString*)title {
+    self.items.lastObject.title = title;
+}
+@end
+
 @interface WKBackForwardListItem (AYBionicWebView)
-@property (nonatomic, strong) UINavigationBar *navigationBar;
--(void)navigationBarWithLeftItems:(NSArray<UIBarButtonItem*>*)leftItems rightItems:(NSArray<UIBarButtonItem*>*)rightItems;
+@property (nonatomic, readonly) NSString *md5;
 @end
 @implementation WKBackForwardListItem (AYBionicWebView)
--(UINavigationBar *)navigationBar {
-    return aywkobjc_getAssociated(self, @selector(navigationBar));
+
+-(NSString *)md5 {
+    NSString *md5 = aywkobjc_getAssociated(self, @selector(md5));
+    if (md5.length == 0) {
+        md5 = [self.URL.absoluteString md5];
+        aywkobjc_setAssociated(self, @selector(md5), md5, YES);
+    }
+    return md5;
 }
--(void)setNavigationBar:(UINavigationBar *)navigationBar {
-    aywkobjc_setAssociated(self, @selector(navigationBar), navigationBar, YES);
-}
--(void)navigationBarWithLeftItems:(NSArray<UIBarButtonItem*>*)leftItems rightItems:(NSArray<UIBarButtonItem*>*)rightItems {
-    UINavigationBar *navigationBar = [[UINavigationBar alloc] init];
-    UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:self.title];
-    item.leftBarButtonItems = leftItems;
-    item.rightBarButtonItems = rightItems;
-    navigationBar.items = [NSArray arrayWithObject:item];
-    self.navigationBar = navigationBar;
-}
+
 @end
+
+static NSArray<UINavigationItem*> *kTransitionItem_t;
+static NSArray<UINavigationItem*> *kTransitionItem_b;
 
 static BOOL kTransition_ing = NO;//YES:转场正在执行
 static BOOL kNavigationBarExist = NO;//YES:导航栏存在且显示
@@ -125,7 +161,7 @@ Class k_UIParallaxDimmingView_Class (){
                         backForwardItem = webView.backForwardList.currentItem;
                     }else{
                         backForwardItem = webView.backForwardList.backItem;
-        //              UIImage* image = [self imageWithUIView:panelView];//获取转场视图中的图片视图image（上一页）
+        //              UIImage* image = [self imageWithUIView:panelView];//获取转场视图中的图片视图image（后一页）
                     }
                 }else{
                     if (isFront) {
@@ -136,16 +172,26 @@ Class k_UIParallaxDimmingView_Class (){
                     }
                 }
                 
-                UINavigationBar * customBar = backForwardItem.navigationBar;
                 
                 UINavigationBar *originBar = webView.viewController.navigationController.navigationBar;
-                if (!customBar) {
-                    customBar = [[UINavigationBar alloc] init];
-                    UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:backForwardItem.title];
-                    customBar.items = [NSArray arrayWithObject:item];
-                    backForwardItem.navigationBar = customBar;
-                }
+                UINavigationBar *customBar = [[UINavigationBar alloc] init];
                 
+//                UIImage *image = [self imageWithUIView:originBar];
+//                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+//                [customBar addSubview:imageView];
+                
+                NSString *key = backForwardItem.md5;
+                NSArray<UINavigationItem*> *items = webView.navigationItemsDict[key];
+                if (!items) {
+                    items = [[NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:originBar.items]] mutableCopy];
+                    items.lastObject.title = backForwardItem.title;
+                }
+                if (isFront) {
+                    kTransitionItem_t = items;
+                }else {
+                    kTransitionItem_b = items;
+                }
+                customBar.items = items;
                 {//原本导航条样式复制到转场导航条上
                     if (customBar.barStyle != originBar.barStyle) {
                         customBar.barStyle = originBar.barStyle;
@@ -169,18 +215,25 @@ Class k_UIParallaxDimmingView_Class (){
                 
                 [panelView addSubview:customBar];//添加转场导航条
             }
+        }else if ([view isKindOfClass:k_UIParallaxDimmingView_Class()]) {
+            CGRect frame = view.frame;//底层阴影浮层视图
+            frame.origin.y -= 64;
+            frame.size.height += 64;
+            view.frame = frame;//转场过程中的阴影浮层（丢改frame覆盖导航条区域）
         }
     }
 }
-//-(UIImage*)imageWithUIView:(UIView*)view{
-//    UIGraphicsBeginImageContextWithOptions(view.bounds.size, YES, [UIScreen mainScreen].scale);
-//    [view drawViewHierarchyInRect:view.bounds afterScreenUpdates:YES];
-//    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-//    UIGraphicsEndImageContext();
-//    return image;
-//}
+
+-(UIImage*)imageWithUIView:(UIView*)view{
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, NO, [UIScreen mainScreen].scale);
+    [view drawViewHierarchyInRect:view.bounds afterScreenUpdates:NO];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
 @end
-#endif
+//#endif
 
 @implementation AYBionicWebView
 
@@ -197,6 +250,7 @@ Class k_UIParallaxDimmingView_Class (){
     super.allowsForwardNavigationGestures = NO;
     super.allowSelectionGestures = NO;
     super.allowLongPressGestures = NO;
+    self.canUpdateNavigationItem = YES;
 }
 
 -(UIViewController *)viewController {
@@ -213,6 +267,23 @@ Class k_UIParallaxDimmingView_Class (){
     return _viewController;
 }
 
+-(NSMutableDictionary<NSString *,NSArray<UINavigationItem*> *> *)navigationItemsDict {
+    if (!_navigationItemsDict) {
+        _navigationItemsDict = [NSMutableDictionary dictionary];
+    }
+    return _navigationItemsDict;
+}
+
+-(void)webView:(WKWebView *)webView titleChange:(NSString *)title {
+    if (self.canUpdateNavigationItem) {
+        self.viewController.navigationController.navigationBar.title = title;
+    }
+    if ([self.observerDelegate respondsToSelector:_cmd]) {
+        [self.observerDelegate webView:self titleChange:title];
+    }
+}
+
+
 #if AYWKWebView_bionicEnabled
 -(void)insertSubview:(UIView *)view belowSubview:(UIView *)siblingSubview {
     if (kNavigationBarExist && (kTransition_ing || self.backNavigationGesture.state == UIGestureRecognizerStateBegan || self.forwardNavigationGesture.state == UIGestureRecognizerStateBegan)) {//可以使设置导航条跟随效果时候insertSubview了转场视图（导航条存在且正在显示，转场开始）
@@ -223,33 +294,55 @@ Class k_UIParallaxDimmingView_Class (){
     [super insertSubview:view belowSubview:siblingSubview];
 }
 
+
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+    self.canUpdateNavigationItem = YES;
+    [super webView:webView decidePolicyForNavigationAction:navigationAction decisionHandler:decisionHandler];
+}
+
 //WKNavigationDelegatePrivate 导航转场结束
 - (void)_webViewDidEndNavigationGesture:(WKWebView *)webView withNavigationToBackForwardListItem:(WKBackForwardListItem *)item {//item 存在时候表示转场完成，item == nil 表示转场取消
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-    [self.navigationDelegate performSelector:_cmd withObject:webView withObject:item];
+    if ([self.navigationDelegate respondsToSelector:_cmd]) {
+        [self.navigationDelegate performSelector:_cmd withObject:webView withObject:item];
+    }
 #pragma clang diagnostic pop
     kTransition_ing = NO;
+    NSArray<UINavigationItem*> *nItem;
     if (item) {
-        self.viewController.title = item.title;
+        nItem = kTransitionItem_b;
+    }else{
+        nItem = kTransitionItem_t;
     }
     self.viewController.navigationController.navigationBar.alpha = 1;//结束后显示原本导条
+    self.viewController.navigationController.navigationBar.items.lastObject.title = nItem.lastObject.title;
     kNavigationBarExist = NO;
-    NSLog(@"WkWebView transition_end");
+    NSLog(@"WkWebView transition_end %@", nItem.lastObject.title);
 }
 
 //WKNavigationDelegatePrivate 导航转场开始
 - (void)_webViewDidBeginNavigationGesture:(WKWebView *)webView {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-    [self.navigationDelegate performSelector:_cmd withObject:webView];
+    if ([self.navigationDelegate respondsToSelector:_cmd]) {
+        [self.navigationDelegate performSelector:_cmd withObject:webView];
+    }
 #pragma clang diagnostic pop
     kTransition_ing = YES;
     kNavigationBarExist = self.viewController.navigationController && !self.viewController.navigationController.navigationBarHidden;
-
-    NSLog(@"WkWebView transition_begin");
+    self.canUpdateNavigationItem = NO;
+    NSLog(@"WkWebView transition_begin %@",self.backForwardList.currentItem.title);
 }
 #endif
 
-
 @end
+
+#pragma mark -
+#pragma mark - Test
+
+
+
+
+
+
