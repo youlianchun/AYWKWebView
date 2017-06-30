@@ -171,16 +171,15 @@ Class k_UIParallaxDimmingView_Class (){
 
 -(void)bionic_addSubview:(UIView *)view {
     [self bionic_addSubview:view];
-    [self addTransitionNavigationBarInViewIfNeeded:view];//如果可以，添加转场导航条
+    [self _addTransitionNavigationBarInViewIfNeeded:view];//如果可以，添加转场导航条
 }
 
-- (void)addTransitionNavigationBarInViewIfNeeded:(UIView*)view {
+- (void)_addTransitionNavigationBarInViewIfNeeded:(UIView*)view {
     if (kNavigationBarExist && kTransition_ing && self.tag == kTransitionTag && [self class] == [UIView class]) {//转场开始时候对addSubview事件进行拦截
         if (view.subviews.count>0) {//场景特殊情况，（仅from、to视图都存在subviews）
             //每次专场 代码将自行两次，一次是from视图，一次是to视图，（其中一个仅是图像视图，一个包含WKScrollView视图）
             AYBionicWebView *webView = aywkw_getAssociated(self, @"rootWKWebView");
             if (webView) {
-                //                view.tag = 110;
                 UIView *sView = view.subviews.firstObject;
                 UIView *panelView = sView.clipsToBounds?view:sView;//视图层次结构导致，（app内部对View进行了完全复制，sView.clipsToBounds为场景特殊情况，用来做标记）
                 BOOL isGoBack = NO;//YES 后退; NO 前进
@@ -220,7 +219,6 @@ Class k_UIParallaxDimmingView_Class (){
                         isCurrent = NO;
                     }
                 }
-                
                 
                 UINavigationBar *originBar = webView.viewController.navigationController.navigationBar;
                 UINavigationBar *virtualBar = [[UINavigationBar alloc] init];
@@ -267,7 +265,6 @@ Class k_UIParallaxDimmingView_Class (){
         }else if ([view isKindOfClass:k_UIParallaxDimmingView_Class()]) {
             [self _frameAdjustWith:view];//底层阴影浮层视图
         }
-        
     }
 }
 
