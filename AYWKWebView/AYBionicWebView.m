@@ -391,7 +391,6 @@ Class k_UIParallaxDimmingView_Class (){
     kTransition_ing = YES;
     kNavigationBarExist = self.viewController.navigationController && !self.viewController.navigationController.navigationBarHidden;
     self.canUpdateNavigationItem = NO;
-    self.idleGesture.enabled = NO;
     NSLog(@"WkWebView transition_begin %@",self.backForwardList.currentItem.title);
 }
 
