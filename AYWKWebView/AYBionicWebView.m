@@ -178,7 +178,7 @@ Class k_UIParallaxDimmingView_Class (){
 }
 
 - (void)_addTransitionNavigationBarInViewIfNeeded:(UIView*)view {
-    if (kNavigationBarExist && kTransition_ing && self.tag == kTransitionTag && [self class] == [UIView class]) {//转场开始时候对addSubview事件进行拦截
+    if (kNavigationBarExist && kTransition_ing && self.tag == kTransitionTag && [self isMemberOfClass:[UIView class]]) {//转场开始时候对addSubview事件进行拦截
         if (view.subviews.count>0) {//场景特殊情况，（仅from、to视图都存在subviews）
             //每次专场 代码将自行两次，一次是from视图，一次是to视图，（其中一个仅是图像视图，一个包含WKScrollView视图）
             AYBionicWebView *webView = aywkw_getAssociated(self, @"rootWKWebView");
@@ -194,7 +194,7 @@ Class k_UIParallaxDimmingView_Class (){
                 }
                 
                 BOOL isFront;//YES 上层; NO 底层
-                if ([sView isKindOfClass:k_UIParallaxDimmingView_Class()] && [sView.subviews.firstObject isKindOfClass:[UIImageView class]]) {//转场视图结构特性，为_UIParallaxDimmingView且第一个子视图是UIImageView时候是上层转场视图
+                if ([sView isMemberOfClass:k_UIParallaxDimmingView_Class()] && [sView.subviews.firstObject isMemberOfClass:[UIImageView class]]) {//转场视图结构特性，为_UIParallaxDimmingView且第一个子视图是UIImageView时候是上层转场视图
                     [self _frameAdjustWith:sView.subviews.firstObject];
                     isFront = YES;
                 }else{
@@ -264,7 +264,7 @@ Class k_UIParallaxDimmingView_Class (){
                 }
                 [panelView addSubview:virtualBar];
             }
-        }else if ([view isKindOfClass:k_UIParallaxDimmingView_Class()]) {
+        }else if ([view isMemberOfClass:k_UIParallaxDimmingView_Class()]) {
             [self _frameAdjustWith:view];//底层阴影浮层视图
         }
     }
