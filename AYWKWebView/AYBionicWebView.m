@@ -35,7 +35,7 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
 @property (nonatomic, weak) UIViewController *viewController;
 @property (nonatomic, strong) NSMutableDictionary <NSString*, NSArray<UINavigationItem*>*> *navigationItemsDict;
 @property (nonatomic, assign) BOOL canUpdateNavigationItem;
-@property (nonatomic, strong) UIIdleGestureRecognizer *idleGesture;
+@property (nonatomic, strong) UIIdleGestureRecognizer *idleGesture;//空闲手势，用来获取用户点击页面行为
 
 @end
 
@@ -332,7 +332,7 @@ Class k_UIParallaxDimmingView_Class (){
 }
 
 -(void)webView:(WKWebView *)webView titleChange:(NSString *)title {
-    if (self.canUpdateNavigationItem && self.idleGesture.tap) {
+    if (self.canUpdateNavigationItem && self.idleGesture.tap) {//可以设置标题且是用户点击页面产生的事件
         self.viewController.navigationController.navigationBar.title = title;
     }
     if ([self.observerDelegate respondsToSelector:_cmd]) {
