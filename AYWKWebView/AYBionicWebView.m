@@ -30,12 +30,57 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
 #pragma mark -
 #pragma mark - AYBionicWebView
 
+@class UIIdleGestureRecognizer;
 @interface AYBionicWebView ()
 @property (nonatomic, weak) UIViewController *viewController;
 @property (nonatomic, strong) NSMutableDictionary <NSString*, NSArray<UINavigationItem*>*> *navigationItemsDict;
 @property (nonatomic, assign) BOOL canUpdateNavigationItem;
+@property (nonatomic, strong) UIIdleGestureRecognizer *idleGesture;
+
 @end
 
+
+@interface UIIdleGestureRecognizer : UITapGestureRecognizer
+@property (nonatomic, weak) AYWKWebView *webView;
+@property (nonatomic, assign) BOOL tap;
+@end
+@implementation UIIdleGestureRecognizer
+
+-(instancetype)initWithWebView:(AYWKWebView*)webView {
+    self = [super initWithTarget:self action:@selector(_handler:)];
+    if (self) {
+        self.webView = webView;
+        self.delegate = (id<UIGestureRecognizerDelegate>)self;
+        [self.webView.scrollView addGestureRecognizer:self];
+        self.tap = YES;
+    }
+    return self;
+}
+-(void)_handler:(UIIdleGestureRecognizer*)gestureRecognizer {
+    
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    if (otherGestureRecognizer.view == self.webView.scrollView.subviews.firstObject) {
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_setTap) object:nil];
+        [self performSelector:@selector(_setTap) withObject:nil afterDelay:0.2];
+    }
+    return YES;
+}
+-(void)setEnabled:(BOOL)enabled {
+    [super setEnabled:enabled];
+    self.tap = NO;
+}
+-(void)_setTap {
+    self.tap = YES;
+}
+-(void)setTap:(BOOL)tap {
+    if (_tap == tap) {
+        return;
+    }
+    _tap = tap;
+}
+@end
 
 @implementation NSString (AYBionicWebView)
 
@@ -260,7 +305,11 @@ Class k_UIParallaxDimmingView_Class (){
     super.allowSelectionGestures = NO;
     super.allowLongPressGestures = NO;
     self.canUpdateNavigationItem = YES;
+    self.idleGesture = [[UIIdleGestureRecognizer alloc] initWithWebView:self];
+//    self.idleGesture.delegate = self;
+//    [self.scrollView.subviews.firstObject addGestureRecognizer:self.idleGesture];
 }
+
 
 -(UIViewController *)viewController {
     if (!_viewController) {
@@ -284,7 +333,7 @@ Class k_UIParallaxDimmingView_Class (){
 }
 
 -(void)webView:(WKWebView *)webView titleChange:(NSString *)title {
-    if (self.canUpdateNavigationItem) {
+    if (self.canUpdateNavigationItem && self.idleGesture.tap) {
         self.viewController.navigationController.navigationBar.title = title;
     }
     if ([self.observerDelegate respondsToSelector:_cmd]) {
@@ -329,6 +378,7 @@ Class k_UIParallaxDimmingView_Class (){
     kTransitionItem_from = nil;
     kTransitionItem_to = nil;
     kNavigationBarExist = NO;
+    self.idleGesture.enabled = YES;
     NSLog(@"WkWebView transition_end %@", nItem.lastObject.title);
 }
 
@@ -343,6 +393,7 @@ Class k_UIParallaxDimmingView_Class (){
     kTransition_ing = YES;
     kNavigationBarExist = self.viewController.navigationController && !self.viewController.navigationController.navigationBarHidden;
     self.canUpdateNavigationItem = NO;
+    self.idleGesture.enabled = NO;
     NSLog(@"WkWebView transition_begin %@",self.backForwardList.currentItem.title);
 }
 
