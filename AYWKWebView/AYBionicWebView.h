@@ -5,6 +5,7 @@
 //  Created by YLCHUN on 2017/6/20.
 //  Copyright © 2017年 ylchun. All rights reserved.
 //
+//  侧滑前进、后退导航栏跟随效果
 
 #import "AYWKWebView.h"
 

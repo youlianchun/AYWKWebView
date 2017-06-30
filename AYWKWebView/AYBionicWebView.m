@@ -95,7 +95,7 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
 //    return [NSString stringWithUTF8String:buffer];
 //}
 
-- (NSString *)md5 {
+- (NSString *)_md5 {
     const char *cStr = [self UTF8String];
     unsigned char digest[CC_MD5_DIGEST_LENGTH];
     CC_MD5( cStr, (CC_LONG)strlen(cStr), digest ); // This is the md5 call
@@ -139,7 +139,7 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
 -(NSString *)md5 {
     NSString *md5 = aywkobjc_getAssociated(self, @selector(md5));
     if (md5.length == 0) {
-        md5 = [self.URL.absoluteString md5];
+        md5 = [self.URL.absoluteString _md5];
         aywkobjc_setAssociated(self, @selector(md5), md5, YES);
     }
     return md5;
