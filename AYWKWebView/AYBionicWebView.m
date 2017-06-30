@@ -237,11 +237,11 @@ Class k_UIParallaxDimmingView_Class (){
                 }
                 
                 if (isCurrent) {
-                     kTransitionItem_from = items;
+                    kTransitionItem_from = items;
                 }else{
-                     kTransitionItem_to = items;
+                    kTransitionItem_to = items;
                 }
-
+                
                 virtualBar.items = items;
                 {//原本导航条样式复制到转场导航条上
                     if (virtualBar.barStyle != originBar.barStyle) {
@@ -262,11 +262,12 @@ Class k_UIParallaxDimmingView_Class (){
                     CGRect rect = [backgroundView.superview convertRect:backgroundView.frame toView:self];
                     virtualBar.frame = rect;
                 }
-                [panelView insertSubview:virtualBar atIndex:0];
+                [panelView addSubview:virtualBar];
             }
         }else if ([view isKindOfClass:k_UIParallaxDimmingView_Class()]) {
             [self _frameAdjustWith:view];//底层阴影浮层视图
         }
+        
     }
 }
 
