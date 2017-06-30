@@ -180,9 +180,9 @@ Class k_UIParallaxDimmingView_Class (){
                 UINavigationBar *originBar = webView.viewController.navigationController.navigationBar;
                 UINavigationBar *virtualBar = [[UINavigationBar alloc] init];
                 
-                //                UIImage *image = [self imageWithUIView:originBar];
-                //                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-                //                [customBar addSubview:imageView];
+//                UIImage *image = [self imageWithUIView:originBar];
+//                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+//                [customBar addSubview:imageView];
                 
                 NSString *key = backForwardItem.md5;
                 NSArray<UINavigationItem*> *items = webView.navigationItemsDict[key];
