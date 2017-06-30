@@ -308,7 +308,12 @@ Class k_UIParallaxDimmingView_Class (){
     self.canUpdateNavigationItem = YES;
     self.idleGesture = [[UIIdleGestureRecognizer alloc] initWithWebView:self];
 }
-
+-(void)dealloc {
+    self.idleGesture = nil;
+    self.viewController = nil;
+    [self.navigationItemsDict removeAllObjects];
+    self.navigationItemsDict = nil;
+}
 
 -(UIViewController *)viewController {
     if (!_viewController) {
