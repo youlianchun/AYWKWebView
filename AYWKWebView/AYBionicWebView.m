@@ -210,13 +210,11 @@ Class k_UIParallaxDimmingView_Class (){
                     }else{
                         backForwardItem = webView.backForwardList.backItem;
                         isCurrent = NO;
-//                        UIImage* image = [self imageWithUIView:panelView];//获取转场视图中的图片视图image（后一页）
                     }
                 }else{
                     if (isFront) {
                         backForwardItem = webView.backForwardList.forwardItem;
                         isCurrent = NO;
-//                        UIImage* image = [self imageWithUIView:panelView];//获取转场视图中的图片视图image（前一页）
                     }else{
                         backForwardItem = webView.backForwardList.currentItem;
                         isCurrent = YES;
@@ -241,6 +239,7 @@ Class k_UIParallaxDimmingView_Class (){
                     kTransitionItem_from = items;
                 }else{
                     kTransitionItem_to = items;
+//                    UIImage* image = [self imageWithUIView:panelView];//获取转场视图中的图片视图image（前一页或后一页）
                 }
                 
                 virtualBar.items = items;
