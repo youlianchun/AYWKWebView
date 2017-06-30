@@ -57,16 +57,29 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
     return  output;
 }
 @end
-
+@interface UINavigationBar (AYBionicWebView)
+@property (nonatomic) NSString *title;
+@property (nonatomic,copy) NSArray<UIBarButtonItem *> *leftBarButtonItems ;
+@property (nonatomic,copy) NSArray<UIBarButtonItem *> *rightBarButtonItems;
+@end
 @implementation UINavigationBar (AYBionicWebView)
-
 -(void)setTitle:(NSString*)title {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    [self performSelector:@selector(_setTitle:) withObject:title afterDelay:0.4];
-}
-
--(void)_setTitle:(NSString*)title {
     self.items.lastObject.title = title;
+}
+-(NSString *)title {
+    return self.items.lastObject.title;
+}
+-(NSArray<UIBarButtonItem *> *)leftBarButtonItems {
+    return self.items.lastObject.leftBarButtonItems;
+}
+-(void)setLeftBarButtonItems:(NSArray<UIBarButtonItem *> *)leftBarButtonItems {
+    self.items.lastObject.leftBarButtonItems = leftBarButtonItems;
+}
+-(NSArray<UIBarButtonItem *> *)rightBarButtonItems {
+    return self.items.lastObject.rightBarButtonItems;
+}
+-(void)setRightBarButtonItems:(NSArray<UIBarButtonItem *> *)rightBarButtonItems {
+    self.items.lastObject.rightBarButtonItems = rightBarButtonItems;
 }
 @end
 
@@ -86,8 +99,8 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
 
 @end
 
-static NSArray<UINavigationItem*> *kTransitionItem_t;//顶部导航栏items
-static NSArray<UINavigationItem*> *kTransitionItem_b;//底部导航栏items
+static NSArray<UINavigationItem*> *kTransitionItem_from;//顶部导航栏items
+static NSArray<UINavigationItem*> *kTransitionItem_to;//底部导航栏items
 
 static BOOL kTransition_ing = NO;//YES:转场正在执行
 static BOOL kNavigationBarExist = NO;//YES:导航栏存在且显示
@@ -113,29 +126,16 @@ Class k_UIParallaxDimmingView_Class (){
 
 -(void)bionic_addSubview:(UIView *)view {
     [self bionic_addSubview:view];
-    if (kNavigationBarExist && kTransition_ing) {//转场开始时候对addSubview事件进行拦截
-        if([self class] == [UIView class]) {
-            [self addTransitionNavigationBarInViewIfNeeded:view];//如果可以，添加转场导航条
-        }
-        if ([self isKindOfClass:k_UIParallaxDimmingView_Class()]) {
-            if ([view class] == [UIView class]) {
-                UIView *v = aywkw_getAssociated(self, @"customBar");
-                if (v) {//将customBar保持再最前端
-                    [self bringSubviewToFront:v];
-//                    aybw_setAssociated(self, @"customBar", nil, NO);//customBar 为week，可不需要
-                }
-            }
-        }
-    }
+    [self addTransitionNavigationBarInViewIfNeeded:view];//如果可以，添加转场导航条
 }
 
 - (void)addTransitionNavigationBarInViewIfNeeded:(UIView*)view {
-    if (self.tag == kTransitionTag) {
+    if (kNavigationBarExist && kTransition_ing && self.tag == kTransitionTag && [self class] == [UIView class]) {//转场开始时候对addSubview事件进行拦截
         if (view.subviews.count>0) {//场景特殊情况，（仅from、to视图都存在subviews）
             //每次专场 代码将自行两次，一次是from视图，一次是to视图，（其中一个仅是图像视图，一个包含WKScrollView视图）
             AYBionicWebView *webView = aywkw_getAssociated(self, @"rootWKWebView");
             if (webView) {
-//                view.tag = 110;
+                //                view.tag = 110;
                 UIView *sView = view.subviews.firstObject;
                 UIView *panelView = sView.clipsToBounds?view:sView;//视图层次结构导致，（app内部对View进行了完全复制，sView.clipsToBounds为场景特殊情况，用来做标记）
                 BOOL isGoBack = NO;//YES 后退; NO 前进
@@ -148,40 +148,41 @@ Class k_UIParallaxDimmingView_Class (){
                 
                 BOOL isFront;//YES 上层; NO 底层
                 if ([sView isKindOfClass:k_UIParallaxDimmingView_Class()] && [sView.subviews.firstObject isKindOfClass:[UIImageView class]]) {//转场视图结构特性，为_UIParallaxDimmingView且第一个子视图是UIImageView时候是上层转场视图
-                    UIImageView *imageView = sView.subviews.firstObject;//转场过程中的阴影imageView（修改frame覆盖导航条区域）
-                    CGRect frame = imageView.frame;
-                    frame.origin.y -= 64;
-                    frame.size.height += 64;
-                    imageView.frame = frame;
+                    [self _frameAdjustWith:sView.subviews.firstObject];
                     isFront = YES;
                 }else{
                     isFront = NO;
                 }
                 //获取当前转场视图（from 或 to）导航条
                 WKBackForwardListItem *backForwardItem;
+                BOOL isCurrent;
                 if (isGoBack) {
                     if (isFront) {
                         backForwardItem = webView.backForwardList.currentItem;
+                        isCurrent = NO;
                     }else{
                         backForwardItem = webView.backForwardList.backItem;
-        //              UIImage* image = [self imageWithUIView:panelView];//获取转场视图中的图片视图image（后一页）
+                        isCurrent = YES;
+//                        UIImage* image = [self imageWithUIView:panelView];//获取转场视图中的图片视图image（后一页）
                     }
                 }else{
                     if (isFront) {
                         backForwardItem = webView.backForwardList.forwardItem;
-        //              UIImage* image = [self imageWithUIView:panelView];//获取转场视图中的图片视图image（前一页）
+                        isCurrent = YES;
+//                        UIImage* image = [self imageWithUIView:panelView];//获取转场视图中的图片视图image（前一页）
                     }else{
                         backForwardItem = webView.backForwardList.currentItem;
+                        isCurrent = NO;
                     }
                 }
                 
                 
                 UINavigationBar *originBar = webView.viewController.navigationController.navigationBar;
-                UINavigationBar *customBar = [[UINavigationBar alloc] init];
+                UINavigationBar *virtualBar = [[UINavigationBar alloc] init];
                 
-//                UIImage *image = [self imageWithUIView:originBar];
-//                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-//                [customBar addSubview:imageView];
+                //                UIImage *image = [self imageWithUIView:originBar];
+                //                UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+                //                [customBar addSubview:imageView];
                 
                 NSString *key = backForwardItem.md5;
                 NSArray<UINavigationItem*> *items = webView.navigationItemsDict[key];
@@ -189,41 +190,47 @@ Class k_UIParallaxDimmingView_Class (){
                     items = [[NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:originBar.items]] mutableCopy];
                     items.lastObject.title = backForwardItem.title;
                 }
-                if (isFront) {
-                    kTransitionItem_t = items;
-                }else {
-                    kTransitionItem_b = items;
+                
+                if (isCurrent) {
+                     kTransitionItem_from = items;
+                }else{
+                     kTransitionItem_to = items;
                 }
-                customBar.items = items;
+
+                virtualBar.items = items;
                 {//原本导航条样式复制到转场导航条上
-                    if (customBar.barStyle != originBar.barStyle) {
-                        customBar.barStyle = originBar.barStyle;
+                    if (virtualBar.barStyle != originBar.barStyle) {
+                        virtualBar.barStyle = originBar.barStyle;
                     }
-                    if (customBar.translucent != originBar.translucent) {
-                        customBar.translucent = originBar.translucent;
+                    if (virtualBar.translucent != originBar.translucent) {
+                        virtualBar.translucent = originBar.translucent;
                     }
-                    if (![customBar.barTintColor isEqual:originBar.barTintColor]) {
-                        customBar.barTintColor = originBar.barTintColor;
+                    if (![virtualBar.barTintColor isEqual:originBar.barTintColor]) {
+                        virtualBar.barTintColor = originBar.barTintColor;
                     }
                     UIImage *backgroundImage = [originBar backgroundImageForBarMetrics:UIBarMetricsDefault];
                     
-                    [customBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
-                    [customBar setShadowImage:originBar.shadowImage];
+                    [virtualBar setBackgroundImage:backgroundImage forBarMetrics:UIBarMetricsDefault];
+                    [virtualBar setShadowImage:originBar.shadowImage];
                     
                     UIView *backgroundView = [originBar valueForKey:@"_backgroundView"];
                     CGRect rect = [backgroundView.superview convertRect:backgroundView.frame toView:self];
-                    customBar.frame = rect;
+                    virtualBar.frame = rect;
                 }
-                aywkw_setAssociated(panelView, @"customBar", customBar, NO);//用于panelView addSubview 时候 customBar置前处理
-                
-                [panelView addSubview:customBar];//添加转场导航条
+                [panelView insertSubview:virtualBar atIndex:0];
             }
         }else if ([view isKindOfClass:k_UIParallaxDimmingView_Class()]) {
-            CGRect frame = view.frame;//底层阴影浮层视图
-            frame.origin.y -= 64;
-            frame.size.height += 64;
-            view.frame = frame;//转场过程中的阴影浮层（修改frame覆盖导航条区域）
+            [self _frameAdjustWith:view];//底层阴影浮层视图
         }
+    }
+}
+
+-(void)_frameAdjustWith:(UIView*)view {
+    if (view) {
+        CGRect frame = view.frame;//底层阴影浮层视图
+        frame.origin.y -= 64;
+        frame.size.height += 64;
+        view.frame = frame;//转场过程中的阴影视图（修改frame覆盖导航条区域）
     }
 }
 
@@ -249,7 +256,7 @@ Class k_UIParallaxDimmingView_Class (){
 
 - (void)customIntitialization {
     super.allowsLinkPreview = NO;
-    super.allowsForwardNavigationGestures = NO;
+//    super.allowsForwardNavigationGestures = NO;
     super.allowSelectionGestures = NO;
     super.allowLongPressGestures = NO;
     self.canUpdateNavigationItem = YES;
@@ -313,12 +320,14 @@ Class k_UIParallaxDimmingView_Class (){
     kTransition_ing = NO;
     NSArray<UINavigationItem*> *nItem;
     if (item) {
-        nItem = kTransitionItem_b;
+        nItem = kTransitionItem_from;
     }else{
-        nItem = kTransitionItem_t;
+        nItem = kTransitionItem_to;
     }
     self.viewController.navigationController.navigationBar.alpha = 1;//结束后显示原本导条
-    self.viewController.navigationController.navigationBar.items.lastObject.title = nItem.lastObject.title;
+    self.viewController.navigationController.navigationBar.title = nItem.lastObject.title;
+    kTransitionItem_from = nil;
+    kTransitionItem_to = nil;
     kNavigationBarExist = NO;
     NSLog(@"WkWebView transition_end %@", nItem.lastObject.title);
 }
