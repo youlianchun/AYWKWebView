@@ -206,20 +206,20 @@ Class k_UIParallaxDimmingView_Class (){
                 if (isGoBack) {
                     if (isFront) {
                         backForwardItem = webView.backForwardList.currentItem;
-                        isCurrent = NO;
+                        isCurrent = YES;
                     }else{
                         backForwardItem = webView.backForwardList.backItem;
-                        isCurrent = YES;
+                        isCurrent = NO;
 //                        UIImage* image = [self imageWithUIView:panelView];//获取转场视图中的图片视图image（后一页）
                     }
                 }else{
                     if (isFront) {
                         backForwardItem = webView.backForwardList.forwardItem;
-                        isCurrent = YES;
+                        isCurrent = NO;
 //                        UIImage* image = [self imageWithUIView:panelView];//获取转场视图中的图片视图image（前一页）
                     }else{
                         backForwardItem = webView.backForwardList.currentItem;
-                        isCurrent = NO;
+                        isCurrent = YES;
                     }
                 }
                 
@@ -373,9 +373,9 @@ Class k_UIParallaxDimmingView_Class (){
     kTransition_ing = NO;
     NSArray<UINavigationItem*> *nItem;
     if (item) {
-        nItem = kTransitionItem_from;
-    }else{
         nItem = kTransitionItem_to;
+    }else{
+        nItem = kTransitionItem_from;
     }
     self.viewController.navigationController.navigationBar.alpha = 1;//结束后显示原本导条
     self.viewController.navigationController.navigationBar.title = nItem.lastObject.title;
