@@ -56,6 +56,7 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
     }
     return self;
 }
+
 -(void)_handler:(UIIdleGestureRecognizer*)gestureRecognizer {
     
 }
@@ -69,7 +70,9 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector);
 }
 -(void)setEnabled:(BOOL)enabled {
     [super setEnabled:enabled];
-    self.tap = NO;
+    if (enabled) {//启用时候为未点击过
+        self.tap = NO;
+    }
 }
 -(void)_setTap {
     self.tap = YES;
@@ -304,8 +307,6 @@ Class k_UIParallaxDimmingView_Class (){
     super.allowLongPressGestures = NO;
     self.canUpdateNavigationItem = YES;
     self.idleGesture = [[UIIdleGestureRecognizer alloc] initWithWebView:self];
-//    self.idleGesture.delegate = self;
-//    [self.scrollView.subviews.firstObject addGestureRecognizer:self.idleGesture];
 }
 
 
@@ -391,6 +392,7 @@ Class k_UIParallaxDimmingView_Class (){
     kTransition_ing = YES;
     kNavigationBarExist = self.viewController.navigationController && !self.viewController.navigationController.navigationBarHidden;
     self.canUpdateNavigationItem = NO;
+    self.idleGesture.enabled = NO;
     NSLog(@"WkWebView transition_begin %@",self.backForwardList.currentItem.title);
 }
 
