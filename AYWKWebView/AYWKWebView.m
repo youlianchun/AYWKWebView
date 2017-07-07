@@ -36,15 +36,15 @@ void aywkw_replaceMethod(Class class, SEL originSelector, SEL newSelector) {
     }
 }
 
-static NSString*  kWebViewEstimatedProgress = @"estimatedProgress";
-static NSString*  kWebViewCanGoBack = @"canGoBack";
-static NSString*  kWebViewCanGoForward = @"canGoForward";
-static NSString*  kWebViewTitle = @"title";
+static NSString * const kWebViewEstimatedProgress = @"estimatedProgress";
+static NSString * const kWebViewCanGoBack = @"canGoBack";
+static NSString * const kWebViewCanGoForward = @"canGoForward";
+static NSString * const kWebViewTitle = @"title";
 
-static NSString*  kWebViewUrl = @"URL";//请求的url
-static NSString*  kWebViewLoading = @"loading";//当前是否正在加载网页
-static NSString*  kWebViewCertificateChain = @"certificateChain";//当前导航的证书链
-static NSString*  kWebViewHasOnlySecureContent = @"hasOnlySecureContent";//标识页面中的所有资源是否通过安全加密连接来加载
+static NSString * const kWebViewUrl = @"URL";//请求的url
+static NSString * const kWebViewLoading = @"loading";//当前是否正在加载网页
+static NSString * const kWebViewCertificateChain = @"certificateChain";//当前导航的证书链
+static NSString * const kWebViewHasOnlySecureContent = @"hasOnlySecureContent";//标识页面中的所有资源是否通过安全加密连接来加载
 
 @interface WkObserver : NSObject
 @end
