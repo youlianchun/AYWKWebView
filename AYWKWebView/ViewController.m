@@ -10,7 +10,7 @@
 #import "AYWKWebView.h"
 
 @interface ViewController ()
-
+@property (nonatomic, strong) AYWKWebView *webView;
 @end
 
 @implementation ViewController
@@ -18,9 +18,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    UIBarButtonItem *newItem = [[UIBarButtonItem alloc] initWithTitle:@"new" style:UIBarButtonItemStylePlain target:self action:@selector(newItemAction)];
+    UIBarButtonItem *coocieItem = [[UIBarButtonItem alloc] initWithTitle:@"cookie" style:UIBarButtonItemStylePlain target:self action:@selector(coocieItemAction)];
+
+    self.navigationItem.rightBarButtonItems = @[newItem, coocieItem];
+    
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     AYWKWebView *webView = [[AYWKWebView alloc] initWithFrame:self.view.bounds configuration:configuration];
-    
+    self.webView = webView;
     webView.allowsBackNavigationGestures = YES;
     webView.allowsForwardNavigationGestures = NO;
     webView.allowSelectionGestures = NO;
@@ -48,8 +53,22 @@
     
     // Do any additional setup after loading the view, typically from a nib.
 }
-
-
+- (NSString *)uuid {
+    uuid_t uuid;
+    uuid_generate(uuid);
+    char buffer[37] = {0};
+    uuid_unparse_upper(uuid, buffer);
+    return [[NSString stringWithUTF8String:buffer] stringByReplacingOccurrencesOfString:@"-" withString:@""];
+}
+-(void)newItemAction {
+    ViewController *vc = [[ViewController alloc] init];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+-(void)coocieItemAction {
+//    document.cookie
+   id cookie = [self.webView stringByEvaluatingJavaScriptFromString:@"document.cookie"];
+    NSLog(@"%@", cookie);
+}
 -(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
     return YES;//同时响应其它手势
 }

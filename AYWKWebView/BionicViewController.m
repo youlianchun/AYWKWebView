@@ -31,7 +31,6 @@
     AYBionicWebView *webView = [[AYBionicWebView alloc] initWithFrame:self.view.bounds configuration:configuration];
     self.webView = webView;
     webView.allowsBackNavigationGestures = YES;
-    
     [self.view insertSubview:webView atIndex:0];
 
     NSURL *url_net = [NSURL URLWithString:@"https://www.baidu.com"];
@@ -41,10 +40,14 @@
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url_net];
     [webView loadRequest:request];
-
+//    _UIWindowSystemGestureStateChangedNotification
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notificationAction:) name:@"_UIWindowSystemGestureStateChangedNotification" object:nil];
 
 }
 
+-(void)notificationAction:(NSNotification *)notification {
+    NSLog(@"%@",notification.name);
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

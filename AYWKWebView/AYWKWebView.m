@@ -89,6 +89,32 @@ static NSString * const kWebViewHasOnlySecureContent = @"hasOnlySecureContent";/
 @end
 
 
+//@implementation  WKWebViewConfiguration (ShareProcessPool)
+////共享进程池
+//WKProcessPool *shareProcessPool() {
+//    static WKProcessPool *kProcessPool;
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//        kProcessPool = [[WKProcessPool alloc] init];
+//    });
+//    return kProcessPool;
+//}
+//
+//-(WKProcessPool *)processPool {
+//    WKProcessPool *processPool = aywkw_getAssociated(self, @"_shareProcessPool");
+//    if (!processPool) {
+//        processPool = shareProcessPool();
+//        [self setProcessPool:processPool];
+//    }
+//    return processPool;
+//}
+//
+//- (void)setProcessPool:(WKProcessPool *)processPool {
+//    aywkw_setAssociated(self, @"_shareProcessPool", processPool, NO);
+//}
+//
+//@end
+
 @interface AYWKWebView ()
 
 
