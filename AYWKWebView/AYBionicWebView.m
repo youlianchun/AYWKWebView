@@ -302,8 +302,8 @@ Class k_UIParallaxDimmingView_Class (){
 - (void)customIntitialization {
     super.allowsLinkPreview = NO;
 //    super.allowsForwardNavigationGestures = NO;
-    super.allowSelectionGestures = NO;
-    super.allowLongPressGestures = NO;
+//    super.allowSelectionGestures = NO;
+//    super.allowLongPressGestures = NO;
     self.canUpdateNavigationItem = YES;
     self.idleGesture = [[UIIdleGestureRecognizer alloc] initWithWebView:self];
 }

@@ -28,8 +28,8 @@
     self.webView = webView;
     webView.allowsBackNavigationGestures = YES;
     webView.allowsForwardNavigationGestures = NO;
-    webView.allowSelectionGestures = NO;
-    webView.allowLongPressGestures = NO;
+//    webView.allowSelectionGestures = NO;
+//    webView.allowLongPressGestures = NO;
     webView.allowsLinkPreview = NO;
     
     [self.view insertSubview:webView atIndex:0];

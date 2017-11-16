@@ -5,7 +5,7 @@
 //  Created by YLCHUN on 2017/5/27.
 //  Copyright © 2017年 ylchun. All rights reserved.
 //
-//  UrlSchemes、OpenUrl超链处理，https默认处理，页面常用手势（前进，后退，长按，选择）属性控制，常用观察者属性进行代理获取，截屏操作，3DTauch版本控制，post请求，本地文件
+//  UrlSchemes、OpenUrl超链处理，https默认处理，页面常用手势（前进，后退）属性控制，常用观察者属性进行代理获取，截屏操作，3DTauch版本控制，post请求，本地文件
 
 #import <WebKit/WebKit.h>
 
@@ -55,16 +55,6 @@
  */
 @property (nonatomic) BOOL allowsForwardNavigationGestures;
 
-/**
- 选择手势控制（长按页面文字或图片显示菜单）
- */
-@property (nonatomic) BOOL allowSelectionGestures;
-
-/**
- 长按手势控制（超链接长按）
- */
-@property (nonatomic) BOOL allowLongPressGestures;
-
 -(id)stringByEvaluatingJavaScriptFromString:(NSString *)javaScriptString;
 
 /**
@@ -75,4 +65,8 @@
 -(UIImage*)screenshot;
 
 + (void)clearCache;
+
 @end
+
+
+

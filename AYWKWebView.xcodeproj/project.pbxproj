@@ -14,7 +14,11 @@
 		A9814B491EF386A700AE2E95 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A9814B471EF386A700AE2E95 /* Main.storyboard */; };
 		A9814B4B1EF386A700AE2E95 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A9814B4A1EF386A700AE2E95 /* Assets.xcassets */; };
 		A9814B4E1EF386A700AE2E95 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A9814B4C1EF386A700AE2E95 /* LaunchScreen.storyboard */; };
-		A9814B571EF386BA00AE2E95 /* AYWKWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = A9814B561EF386BA00AE2E95 /* AYWKWebView.m */; };
+		A9814B571EF386BA00AE2E95 /* AYWKWebView_old.m in Sources */ = {isa = PBXBuildFile; fileRef = A9814B561EF386BA00AE2E95 /* AYWKWebView_old.m */; };
+		A99AAD761FBD5BCC0066F048 /* AYWKWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = A99AAD6D1FBD5BCB0066F048 /* AYWKWebView.m */; };
+		A99AAD771FBD5BCC0066F048 /* DelegateInterceptor.mm in Sources */ = {isa = PBXBuildFile; fileRef = A99AAD711FBD5BCB0066F048 /* DelegateInterceptor.mm */; };
+		A99AAD781FBD5BCC0066F048 /* aywkw_objc.m in Sources */ = {isa = PBXBuildFile; fileRef = A99AAD721FBD5BCB0066F048 /* aywkw_objc.m */; };
+		A99AAD791FBD5BCC0066F048 /* AYWKWebView+Cookie.m in Sources */ = {isa = PBXBuildFile; fileRef = A99AAD741FBD5BCB0066F048 /* AYWKWebView+Cookie.m */; };
 		A9B3E4E21F03466800DF90BA /* AYBionicWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = A9B3E4E11F03466800DF90BA /* AYBionicWebView.m */; };
 		A9B3E4EB1F0349A500DF90BA /* BionicViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A9B3E4EA1F0349A500DF90BA /* BionicViewController.m */; };
 		A9FA9F1C1F04E4DE00502005 /* UIBarButtonItem+Back.m in Sources */ = {isa = PBXBuildFile; fileRef = A9FA9F1B1F04E4DE00502005 /* UIBarButtonItem+Back.m */; };
@@ -32,8 +36,16 @@
 		A9814B4A1EF386A700AE2E95 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A9814B4D1EF386A700AE2E95 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A9814B4F1EF386A700AE2E95 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A9814B551EF386BA00AE2E95 /* AYWKWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYWKWebView.h; sourceTree = "<group>"; };
-		A9814B561EF386BA00AE2E95 /* AYWKWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYWKWebView.m; sourceTree = "<group>"; };
+		A9814B551EF386BA00AE2E95 /* AYWKWebView_old.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYWKWebView_old.h; sourceTree = "<group>"; };
+		A9814B561EF386BA00AE2E95 /* AYWKWebView_old.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYWKWebView_old.m; sourceTree = "<group>"; };
+		A99AAD6D1FBD5BCB0066F048 /* AYWKWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYWKWebView.m; sourceTree = "<group>"; };
+		A99AAD6E1FBD5BCB0066F048 /* AYWKWebView+Cookie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AYWKWebView+Cookie.h"; sourceTree = "<group>"; };
+		A99AAD701FBD5BCB0066F048 /* aywkw_objc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aywkw_objc.h; sourceTree = "<group>"; };
+		A99AAD711FBD5BCB0066F048 /* DelegateInterceptor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DelegateInterceptor.mm; sourceTree = "<group>"; };
+		A99AAD721FBD5BCB0066F048 /* aywkw_objc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = aywkw_objc.m; sourceTree = "<group>"; };
+		A99AAD731FBD5BCB0066F048 /* DelegateInterceptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DelegateInterceptor.h; sourceTree = "<group>"; };
+		A99AAD741FBD5BCB0066F048 /* AYWKWebView+Cookie.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AYWKWebView+Cookie.m"; sourceTree = "<group>"; };
+		A99AAD751FBD5BCB0066F048 /* AYWKWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYWKWebView.h; sourceTree = "<group>"; };
 		A9B3E4E01F03466800DF90BA /* AYBionicWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYBionicWebView.h; sourceTree = "<group>"; };
 		A9B3E4E11F03466800DF90BA /* AYBionicWebView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYBionicWebView.m; sourceTree = "<group>"; };
 		A9B3E4E91F0349A500DF90BA /* BionicViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BionicViewController.h; sourceTree = "<group>"; };
@@ -72,8 +84,9 @@
 		A9814B3D1EF386A700AE2E95 /* AYWKWebView */ = {
 			isa = PBXGroup;
 			children = (
-				A9814B551EF386BA00AE2E95 /* AYWKWebView.h */,
-				A9814B561EF386BA00AE2E95 /* AYWKWebView.m */,
+				A99AAD6C1FBD5BCB0066F048 /* AYWKWebView */,
+				A9814B551EF386BA00AE2E95 /* AYWKWebView_old.h */,
+				A9814B561EF386BA00AE2E95 /* AYWKWebView_old.m */,
 				A9B3E4E01F03466800DF90BA /* AYBionicWebView.h */,
 				A9B3E4E11F03466800DF90BA /* AYBionicWebView.m */,
 				A9FA9F1A1F04E4DE00502005 /* UIBarButtonItem+Back.h */,
@@ -100,6 +113,29 @@
 				A9814B3F1EF386A700AE2E95 /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		A99AAD6C1FBD5BCB0066F048 /* AYWKWebView */ = {
+			isa = PBXGroup;
+			children = (
+				A99AAD6F1FBD5BCB0066F048 /* class */,
+				A99AAD751FBD5BCB0066F048 /* AYWKWebView.h */,
+				A99AAD6D1FBD5BCB0066F048 /* AYWKWebView.m */,
+				A99AAD6E1FBD5BCB0066F048 /* AYWKWebView+Cookie.h */,
+				A99AAD741FBD5BCB0066F048 /* AYWKWebView+Cookie.m */,
+			);
+			path = AYWKWebView;
+			sourceTree = "<group>";
+		};
+		A99AAD6F1FBD5BCB0066F048 /* class */ = {
+			isa = PBXGroup;
+			children = (
+				A99AAD701FBD5BCB0066F048 /* aywkw_objc.h */,
+				A99AAD721FBD5BCB0066F048 /* aywkw_objc.m */,
+				A99AAD731FBD5BCB0066F048 /* DelegateInterceptor.h */,
+				A99AAD711FBD5BCB0066F048 /* DelegateInterceptor.mm */,
+			);
+			path = class;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -175,10 +211,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				A9814B461EF386A700AE2E95 /* ViewController.m in Sources */,
+				A99AAD781FBD5BCC0066F048 /* aywkw_objc.m in Sources */,
 				A9B3E4E21F03466800DF90BA /* AYBionicWebView.m in Sources */,
 				A9B3E4EB1F0349A500DF90BA /* BionicViewController.m in Sources */,
 				A9FA9F1C1F04E4DE00502005 /* UIBarButtonItem+Back.m in Sources */,
-				A9814B571EF386BA00AE2E95 /* AYWKWebView.m in Sources */,
+				A99AAD791FBD5BCC0066F048 /* AYWKWebView+Cookie.m in Sources */,
+				A99AAD771FBD5BCC0066F048 /* DelegateInterceptor.mm in Sources */,
+				A9814B571EF386BA00AE2E95 /* AYWKWebView_old.m in Sources */,
+				A99AAD761FBD5BCC0066F048 /* AYWKWebView.m in Sources */,
 				A9814B431EF386A700AE2E95 /* AppDelegate.m in Sources */,
 				A9814B401EF386A700AE2E95 /* main.m in Sources */,
 			);
