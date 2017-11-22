@@ -13,7 +13,8 @@
 #pragma mark -
 #pragma mark - WKContentView
 @implementation UIView (WKContentView)
-+(void)load {
++(void)load
+{
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         Class cls = objc_getClass("WKContentView");
@@ -50,7 +51,8 @@ static NSString * const kWebViewHasOnlySecureContent = @"hasOnlySecureContent";/
 @interface WkObserver : NSObject
 @end
 @implementation WkObserver
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context{
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
+{
     id newValue = [change objectForKey:@"new"];
     AYWKWebView *webView = object;
     if (keyPath == kWebViewEstimatedProgress && [webView.obsDelegateInterceptor respondsToSelector:@selector(webView:estimatedProgress:)]) {
@@ -110,7 +112,8 @@ static NSString * const kWebViewHasOnlySecureContent = @"hasOnlySecureContent";/
 @synthesize observerDelegate = _observerDelegate;
 #pragma mark - evaluateJavaScript fix
 
--(void)evaluateJavaScript:(NSString *)javaScriptString completionHandler:(void (^)(id _Nullable, NSError * _Nullable))completionHandler {
+-(void)evaluateJavaScript:(NSString *)javaScriptString completionHandler:(void (^)(id _Nullable, NSError * _Nullable))completionHandler
+{
     id strongSelf = self;
     [super evaluateJavaScript:javaScriptString completionHandler:^(id object, NSError *error) {
         [strongSelf title];
@@ -121,7 +124,8 @@ static NSString * const kWebViewHasOnlySecureContent = @"hasOnlySecureContent";/
 }
 
 #pragma mark - post
--(WKNavigation *)loadRequest:(NSURLRequest *)request {
+-(WKNavigation *)loadRequest:(NSURLRequest *)request
+{
     NSString *url = request.URL.absoluteString;
     NSString *str = [url lowercaseString];
     BOOL hasPrefix_var = [str hasPrefix:@"/"];
@@ -134,7 +138,7 @@ static NSString * const kWebViewHasOnlySecureContent = @"hasOnlySecureContent";/
         }
         if (aywkw_systemVersion() >= 9.0) {
             return [self loadFileURL:_url allowingReadAccessToURL:_url];
-        }else{
+        }else {
             NSURLRequest *_request = request;
             if (_url != _request.URL) {
                 _request = [NSURLRequest requestWithURL:_url];
@@ -142,14 +146,15 @@ static NSString * const kWebViewHasOnlySecureContent = @"hasOnlySecureContent";/
             return [super loadRequest:_request];
         }
     }
-    else if ([[request.HTTPMethod uppercaseString] isEqualToString:@"POST"])
+    else if ( [request.HTTPMethod caseInsensitiveCompare:@"POST"] == NSOrderedSame)
     {
         NSString *params = [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding];
-        if ([params containsString:@"="]) {
+        if ([params containsString:@"="])
+        {
             params = [params stringByReplacingOccurrencesOfString:@"=" withString:@"\":\""];
             params = [params stringByReplacingOccurrencesOfString:@"&" withString:@"\",\""];
             params = [NSString stringWithFormat:@"{\"%@\"}", params];
-        }else{
+        }else {
             params = @"{}";
         }
         NSString *postJavaScript = [NSString stringWithFormat:@"\
@@ -171,30 +176,33 @@ static NSString * const kWebViewHasOnlySecureContent = @"hasOnlySecureContent";/
                                     form.submit();", url, params];
         __weak typeof(self) wself = self;
         [self evaluateJavaScript:postJavaScript completionHandler:^(id object, NSError * _Nullable error) {
-            if (error && [wself.navigationDelegate respondsToSelector:@selector(webView:didFailProvisionalNavigation:withError:)]) {
+            if (error && [wself.uiDelegateInterceptor originalRespondsToSelector:@selector(webView:didFailProvisionalNavigation:withError:)])
+            {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [wself.navigationDelegate webView:wself didFailProvisionalNavigation:nil withError:error];
                 });
             }
         }];
         return nil;
-    }
-    else
-    {
+    }else {
         return [super loadRequest:request];
     }
 }
 
 
--(instancetype)initWithFrame:(CGRect)frame configuration:(WKWebViewConfiguration *)configuration {
+-(instancetype)initWithFrame:(CGRect)frame configuration:(WKWebViewConfiguration *)configuration
+{
     self = [super initWithFrame:frame configuration:configuration];
     if (self) {
-        [self _customIntitialization];
+        [self aywkw_customIntitialization];
     }
     return self;
 }
 
-- (void)_customIntitialization{
+- (void)aywkw_customIntitialization
+{
+    self.opaque = NO;
+    
     self.navigationDelegate = nil;
     self.UIDelegate = nil;
     self.observerDelegate = nil;
@@ -204,9 +212,12 @@ static NSString * const kWebViewHasOnlySecureContent = @"hasOnlySecureContent";/
     self.allowsBackNavigationGestures = YES;
     self.allowsForwardNavigationGestures = YES;
     [super setAllowsBackForwardNavigationGestures:YES];//执行后会添加手势
+    
+    self.scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
 }
 
--(void)dealloc {
+-(void)dealloc
+{
     self.wkObserverEnabled = NO;
     _wkObserver = nil;
     _navDelegateInterceptor = nil;
@@ -214,12 +225,15 @@ static NSString * const kWebViewHasOnlySecureContent = @"hasOnlySecureContent";/
     _obsDelegateInterceptor = nil;
 }
 
-bool aywkw_isBackForwardNavigationGestures(UIGestureRecognizer*gestureRecognizer) {
+bool aywkw_isBackForwardNavigationGestures(UIGestureRecognizer*gestureRecognizer)
+{
     return [gestureRecognizer isKindOfClass:[UIScreenEdgePanGestureRecognizer class]] && [gestureRecognizer.description containsString:@"handleNavigationTransition:"];
 }
 
--(void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
-    if (aywkw_isBackForwardNavigationGestures(gestureRecognizer)) {
+-(void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
+{
+    if (aywkw_isBackForwardNavigationGestures(gestureRecognizer))
+    {
         UIScreenEdgePanGestureRecognizer *navigationGestures = (UIScreenEdgePanGestureRecognizer*)gestureRecognizer;
         if (navigationGestures.edges == UIRectEdgeLeft) {
             self.backNavigationGesture = navigationGestures;
@@ -231,7 +245,8 @@ bool aywkw_isBackForwardNavigationGestures(UIGestureRecognizer*gestureRecognizer
     [super addGestureRecognizer:gestureRecognizer];
 }
 
--(void)setWkObserverEnabled:(BOOL)wkObserverEnabled {
+-(void)setWkObserverEnabled:(BOOL)wkObserverEnabled
+{
     if (_wkObserverEnabled == wkObserverEnabled) {
         return;
     }
@@ -239,14 +254,16 @@ bool aywkw_isBackForwardNavigationGestures(UIGestureRecognizer*gestureRecognizer
     [self wkObserverSet:_wkObserverEnabled];
 }
 
--(void)wkObserverSet:(BOOL)enabled {
+-(void)wkObserverSet:(BOOL)enabled
+{
     static NSArray* kObserverKeyPath;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         kObserverKeyPath = @[kWebViewEstimatedProgress, kWebViewCanGoBack, kWebViewCanGoForward, kWebViewTitle, kWebViewUrl, kWebViewLoading, kWebViewCertificateChain, kWebViewHasOnlySecureContent];
     });
     
-    for (NSString *keyPath in kObserverKeyPath) {
+    for (NSString *keyPath in kObserverKeyPath)
+    {
         if (enabled) {
             [self addObserver:self.wkObserver forKeyPath:keyPath options:NSKeyValueObservingOptionNew context:nil];
         }else {
@@ -255,28 +272,33 @@ bool aywkw_isBackForwardNavigationGestures(UIGestureRecognizer*gestureRecognizer
     }
 }
 
--(void)setObserverDelegate:(id<AYWKObserverDelegate>)observerDelegate {
+-(void)setObserverDelegate:(id<AYWKObserverDelegate>)observerDelegate
+{
     self.obsDelegateInterceptor = [[DelegateInterceptor alloc] initWithOriginal:observerDelegate accepter:self];
     _observerDelegate = self.obsDelegateInterceptor.mySelf;
 }
 
--(id<AYWKObserverDelegate>)observerDelegate {
+-(id<AYWKObserverDelegate>)observerDelegate
+{
     return self.obsDelegateInterceptor.original;
 }
 
-double aywkw_systemVersion() {
+double aywkw_systemVersion()
+{
     return [[[UIDevice currentDevice] systemVersion] doubleValue];
 }
 
 #pragma mark - allowsLinkPreview
--(BOOL)allowsLinkPreview {
+-(BOOL)allowsLinkPreview
+{
     if (aywkw_systemVersion() >= 9.0) {
         return [super allowsLinkPreview];
     }
     return NO;
 }
 
--(void)setAllowsLinkPreview:(BOOL)allowsLinkPreview {
+-(void)setAllowsLinkPreview:(BOOL)allowsLinkPreview
+{
     if (aywkw_systemVersion() >= 9.0) {
         [super setAllowsLinkPreview:allowsLinkPreview];
     }
@@ -284,36 +306,36 @@ double aywkw_systemVersion() {
 
 #pragma mark - Gestures
 #pragma mark backNavigationGesture
--(void)setAllowsBackNavigationGestures:(BOOL)allowsBackNavigationGestures {
+-(void)setAllowsBackNavigationGestures:(BOOL)allowsBackNavigationGestures
+{
     _allowsBackNavigationGestures = allowsBackNavigationGestures;
     self.backNavigationGesture.enabled = _allowsBackNavigationGestures;
 }
--(void)setBackNavigationGesture:(UIScreenEdgePanGestureRecognizer *)backNavigationGesture {
+-(void)setBackNavigationGesture:(UIScreenEdgePanGestureRecognizer *)backNavigationGesture
+{
     _backNavigationGesture = backNavigationGesture;
     _backNavigationGesture.enabled = self.allowsBackNavigationGestures;
 }
 
 #pragma mark forwardNavigationGesture
--(void)setAllowsForwardNavigationGestures:(BOOL)allowsForwardNavigationGestures {
+-(void)setAllowsForwardNavigationGestures:(BOOL)allowsForwardNavigationGestures
+{
     _allowsForwardNavigationGestures = allowsForwardNavigationGestures;
     self.forwardNavigationGesture.enabled = _allowsForwardNavigationGestures;
 }
--(void)setForwardNavigationGesture:(UIScreenEdgePanGestureRecognizer *)forwardNavigationGesture {
+
+-(void)setForwardNavigationGesture:(UIScreenEdgePanGestureRecognizer *)forwardNavigationGesture
+{
     _forwardNavigationGesture = forwardNavigationGesture;
     _forwardNavigationGesture.enabled = self.allowsForwardNavigationGestures;
 }
 
-#pragma mark - 滚动速率
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    if (scrollView.contentSize.height>scrollView.bounds.size.height*1.5) {//html页面高度小于1.5倍webView高度时候不做速率处理
-        scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
-    }
-}
-
 #pragma mark - js调用
--(id)stringByEvaluatingJavaScriptFromString:(NSString *)javaScriptString {
+-(id)stringByEvaluatingJavaScriptFromString:(NSString *)javaScriptString
+{
     __block NSString* result = nil;
-    if (javaScriptString.length>0) {
+    if (javaScriptString.length>0)
+    {
         __block BOOL isExecuted = NO;
         [self evaluateJavaScript:javaScriptString completionHandler:^(id obj, NSError *error) {
             result = obj;
@@ -329,27 +351,32 @@ double aywkw_systemVersion() {
 
 #pragma mark - 代理拦截
 
--(void)setNavigationDelegate:(id<WKNavigationDelegate>)navigationDelegate {
+-(void)setNavigationDelegate:(id<WKNavigationDelegate>)navigationDelegate
+{
     self.navDelegateInterceptor = [[DelegateInterceptor alloc] initWithOriginal:navigationDelegate accepter:self];
     [super setNavigationDelegate:self.navDelegateInterceptor.mySelf];
 }
 
--(void)setUIDelegate:(id<WKUIDelegate>)UIDelegate {
+-(void)setUIDelegate:(id<WKUIDelegate>)UIDelegate
+{
     self.uiDelegateInterceptor = [[DelegateInterceptor alloc] initWithOriginal:UIDelegate accepter:self];
     [super setUIDelegate:self.uiDelegateInterceptor.mySelf];
 }
 
--(id<WKNavigationDelegate>)navigationDelegate {
+-(id<WKNavigationDelegate>)navigationDelegate
+{
     return self.navDelegateInterceptor.original;
 }
 
--(id<WKUIDelegate>)UIDelegate {
+-(id<WKUIDelegate>)UIDelegate
+{
     return self.uiDelegateInterceptor.original;
 }
 
 #pragma mark -
 #pragma mark UrlSchemes
-NSArray* aywkw_infoUrlSchemes() {
+NSArray* aywkw_infoUrlSchemes()
+{
     static NSMutableArray *kInfoUrlSchemes;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -364,28 +391,25 @@ NSArray* aywkw_infoUrlSchemes() {
     return kInfoUrlSchemes;
 }
 
-NSArray* aywkw_infoOpenURLs() {
-    static NSMutableArray *kInfoOpenURLs;
+NSArray* aywkw_infoOpenURLs()
+{
+    static NSArray *kInfoOpenURLs;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        kInfoOpenURLs = [NSMutableArray array];
-        [kInfoOpenURLs addObject:@"tel"];
-        [kInfoOpenURLs addObject:@"telprompt"];
-        [kInfoOpenURLs addObject:@"sms"];
-        [kInfoOpenURLs addObject:@"mailto"];
-        [kInfoOpenURLs addObject:@"itms-apps"];
-        [kInfoOpenURLs addObject:@"itms"];
+        kInfoOpenURLs = @[@"tel", @"telprompt", @"sms", @"mailto", @"itms-apps", @"itms"];
     });
     return kInfoOpenURLs;
 }
 
-bool aywkw_isOpenUrl(NSURL *url) {
-   return [aywkw_infoOpenURLs() containsObject:url.scheme] ||
+bool aywkw_isOpenUrl(NSURL *url)
+{
+    return [aywkw_infoOpenURLs() containsObject:url.scheme] ||
     [url.absoluteString isEqualToString:UIApplicationOpenSettingsURLString] ||
     [aywkw_infoUrlSchemes() containsObject:url.scheme];
 }
 
-void aywkw_openUrl(NSURL *url, void(^befor)()) {
+void aywkw_openUrl(NSURL *url, void(^befor)())
+{
     dispatch_async(dispatch_get_main_queue(), ^{
         UIApplication *app = [UIApplication sharedApplication];
         if ([app canOpenURL:url]){
@@ -397,9 +421,11 @@ void aywkw_openUrl(NSURL *url, void(^befor)()) {
     });
 }
 #pragma mark OpenURLs拦截
--(void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+-(void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
+{
     NSURL *url = navigationAction.request.URL;
-    if (aywkw_isOpenUrl(url)) {
+    if (aywkw_isOpenUrl(url))
+    {
         decisionHandler(WKNavigationActionPolicyCancel);
         aywkw_openUrl(url, ^{
             aywkw_userInteractionSleep(self, 0.2);
@@ -415,12 +441,16 @@ void aywkw_openUrl(NSURL *url, void(^befor)()) {
 }
 
 #pragma mark  https
-- (void)webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential *))completionHandler {
+- (void)webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential *))completionHandler
+{
     if ([self.navDelegateInterceptor originalRespondsToSelector:_cmd]) {
         [self.navDelegateInterceptor.original webView:webView didReceiveAuthenticationChallenge:challenge completionHandler:completionHandler];
-    }else{
-        if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
-            if ([challenge previousFailureCount] == 0) {
+    } else
+    {
+        if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust])
+        {
+            if ([challenge previousFailureCount] == 0)
+            {
                 NSURLCredential *credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
                 completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
             } else {
@@ -432,7 +462,8 @@ void aywkw_openUrl(NSURL *url, void(^befor)()) {
     }
 }
 
-- (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView {
+- (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView
+{
     if ([self.navDelegateInterceptor originalRespondsToSelector:_cmd]) {
         [self.navDelegateInterceptor.original webViewWebContentProcessDidTerminate:webView];
     }else{
@@ -445,7 +476,8 @@ void aywkw_openUrl(NSURL *url, void(^befor)()) {
 #pragma mark -
 
 #pragma mark - 响应间隔禁止
-void aywkw_userInteractionSleep(UIView *view, double interval) {
+void aywkw_userInteractionSleep(UIView *view, double interval)
+{
     if(interval <= 0 || !view.userInteractionEnabled) {
         return;
     }
@@ -457,7 +489,8 @@ void aywkw_userInteractionSleep(UIView *view, double interval) {
 
 
 #pragma mark - 截图
--(UIImage*)screenshot {
+-(UIImage*)screenshot
+{
     UIGraphicsBeginImageContextWithOptions(self.bounds.size, YES, 0);
     for (UIView *subView in self.subviews) {
         [subView drawViewHierarchyInRect:subView.bounds afterScreenUpdates:YES];
@@ -469,43 +502,16 @@ void aywkw_userInteractionSleep(UIView *view, double interval) {
 
 #pragma mark - class
 #pragma mark - 缓存清理
-+ (void)clearCache {
-    if (aywkw_systemVersion() >= 9.0) {
-        //        NSSet *websiteDataTypes = [NSSet setWithArray:@[
-        ////                                                        磁盘缓存
-        //                                                        WKWebsiteDataTypeDiskCache,
-        //
-        ////                                                        离线APP缓存
-        //                                                        //WKWebsiteDataTypeOfflineWebApplicationCache,
-        //
-        ////                                                        内存缓存
-        //                                                        WKWebsiteDataTypeMemoryCache,
-        //
-        ////                                                        web LocalStorage 缓存
-        //                                                        //WKWebsiteDataTypeLocalStorage,
-        //
-        ////                                                        web Cookies缓存
-        //                                                        //WKWebsiteDataTypeCookies,
-        //
-        ////                                                        SessionStorage 缓存
-        //                                                        //WKWebsiteDataTypeSessionStorage,
-        //
-        ////                                                        索引DB缓存
-        //                                                        //WKWebsiteDataTypeIndexedDBDatabases,
-        //
-        ////                                                        数据库缓存
-        //                                                        //WKWebsiteDataTypeWebSQLDatabases
-        //
-        //                                                        ]];
-        //// All kinds of data
-        NSSet *websiteDataTypes = [WKWebsiteDataStore allWebsiteDataTypes];
-        //// Date from
++ (void)clearCache
+{
+    if (aywkw_systemVersion() >= 9.0)
+    {
+        NSSet *websiteDataTypes = [WKWebsiteDataStore allWebsiteDataTypes];// WebsiteDataTypes: WKWebsiteDataRecord.h
         NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
-        //// Execute
         [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{
-            // Done
         }];
-    } else {
+    } else
+    {
         
         NSString *libraryDir = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,NSUserDomainMask, YES)[0];
         NSString *bundleId = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
